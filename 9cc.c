@@ -21,6 +21,90 @@ struct Token
     char *str;
 };
 
+Token *token;
+
+void error(char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
+
+bool consume(char op)
+{
+    if (token->kind != TK_RESERVED || token->str[0] != op)
+    {
+        return false;
+    }
+    token = token->next;
+    return true;
+}
+
+void expect(char op)
+{
+    if (token->kind != TK_RESERVED || token->str[0] != op)
+    {
+        error("'%c'ではありません", op);
+    }
+    token = token->next;
+}
+
+int expect_number()
+{
+    if (token->kind != TK_NUM)
+    {
+        error("数ではありません");
+    }
+    int val = token->val;
+    token = token->next;
+    return val;
+}
+
+bool at_eof()
+{
+    return token->kind == TK_EOF;
+}
+
+Token *new_token(TokenKind kind, Token *cur, char *str)
+{
+    Token *tok = calloc(1, sizeof(Token));
+    tok->kind = kind;
+    tok->str = str;
+    cur->next = tok;
+    return tok;
+}
+Token *tokenize(char *p)
+{
+    Token head;
+    head.next = NULL;
+    Token *cur = &head;
+
+    while (*p)
+    {
+        if (isspace(*p))
+        {
+            p++;
+            continue;
+        }
+        if (*p == '+' || *p == '-')
+        {
+            cur = new_token(TK_RESERVED, cur, p++);
+
+            continue;
+        }
+        if (isdigit(*p))
+        {
+            cur = new_token(TK_NUM, cur, p);
+            cur->val = strtol(p, &p, 10);
+            continue;
+        }
+        error("トークナイズできません");
+    }
+    new_token(TK_EOF, cur, p);
+    return head.next;
+}
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -28,28 +112,23 @@ int main(int argc, char *argv[])
         fprintf(stderr, "引数の個数が正しくありません\n");
         exit(1);
     }
+
+    token = tokenize(argv[1]);
+
     printf(".intel_syntax noprefix\n");
     printf(".global main\n");
     printf("main:\n");
-    char *p = argv[1];
-    printf(" mov eax, %ld\n", strtol(p, &p, 10));
-    while (*p != '\0')
+
+    printf(" mov eax, %d\n", expect_number());
+
+    while (!at_eof())
     {
-        if (*p == '+')
+        if (consume('+'))
         {
-            p++;
-            printf(" add eax, %ld\n", strtol(p, &p, 10));
+            printf(" add rax, %d\n", expect_number());
         }
-        else if (*p == '-')
-        {
-            p++;
-            printf(" sub eax, %ld\n", strtol(p, &p, 10));
-        }
-        else
-        {
-            fprintf(stderr, "予期しない文字です:'%c'\n", *p);
-            exit(1);
-        }
+        expect('-');
+        printf(" sub rax, %d\n", expect_number());
     }
     printf(" ret\n");
 
