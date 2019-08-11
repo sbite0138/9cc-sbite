@@ -141,6 +141,7 @@ int main(int argc, char *argv[])
         if (consume('+'))
         {
             printf(" add rax, %d\n", expect_number());
+            continue;
         }
         expect('-');
         printf(" sub rax, %d\n", expect_number());
