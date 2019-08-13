@@ -57,57 +57,6 @@ Node *new_node_num(int val)
     return node;
 }
 
-Node *expr()
-{
-    Node *node = mul();
-
-    for (;;)
-    {
-        if (consume('+'))
-        {
-            node = new_node(ND_ADD, node, mul());
-        }
-        else if (consume('-'))
-        {
-            node = new_node(ND_SUB, node, mul());
-        }
-        else
-        {
-            return node;
-        }
-    }
-}
-
-Node *mul()
-{
-    Node *node = term();
-    for (;;)
-    {
-        if (consume('*'))
-        {
-            node = new_node(ND_MUL, node, term());
-        }
-        else if (consume('/'))
-        {
-            node = new_node(ND_DIV, node, term());
-        }
-        else
-        {
-            return node;
-        }
-    }
-}
-
-Node *term()
-{
-    if (consume('('))
-    {
-        Node *node = expr();
-        expect(')');
-        return node;
-    }
-    return new_node_num(expect_number());
-}
 Token *token;
 char *user_input;
 
@@ -207,6 +156,63 @@ Token *tokenize(char *p)
     new_token(TK_EOF, cur, p);
     return head.next;
 }
+
+Node *expr();
+Node *mul();
+Node *term();
+
+Node *expr()
+{
+    Node *node = mul();
+
+    for (;;)
+    {
+        if (consume('+'))
+        {
+            node = new_node(ND_ADD, node, mul());
+        }
+        else if (consume('-'))
+        {
+            node = new_node(ND_SUB, node, mul());
+        }
+        else
+        {
+            return node;
+        }
+    }
+}
+
+Node *mul()
+{
+    Node *node = term();
+    for (;;)
+    {
+        if (consume('*'))
+        {
+            node = new_node(ND_MUL, node, term());
+        }
+        else if (consume('/'))
+        {
+            node = new_node(ND_DIV, node, term());
+        }
+        else
+        {
+            return node;
+        }
+    }
+}
+
+Node *term()
+{
+    if (consume('('))
+    {
+        Node *node = expr();
+        expect(')');
+        return node;
+    }
+    return new_node_num(expect_number());
+}
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
