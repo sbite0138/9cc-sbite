@@ -31,7 +31,8 @@ typedef enum
     ND_NUM,
     ND_EQ,
     ND_NEQ,
-    ND_LT
+    ND_LT,
+    ND_LEQ
 } NodeKind;
 
 typedef struct Node Node;
@@ -145,7 +146,7 @@ Token *tokenize(char *p)
             p++;
             continue;
         }
-        if ((memcmp(p, "==", 2) == 0) || (memcmp(p, "!=", 2) == 0))
+        if ((memcmp(p, "==", 2) == 0) || (memcmp(p, "!=", 2) == 0) || (memcmp(p, "<=", 2) == 0) || (memcmp(p, ">=", 2) == 0))
         {
             cur = new_token(TK_RESERVED, cur, p, 2);
             p += 2;
@@ -204,7 +205,15 @@ Node *relational()
     Node *node = add();
     for (;;)
     {
-        if (consume("<"))
+        if (consume("<="))
+        {
+            node = new_node(ND_LEQ, node, add());
+        }
+        else if (consume(">="))
+        {
+            node = new_node(ND_LEQ, add(), node);
+        }
+        else if (consume("<"))
         {
             node = new_node(ND_LT, node, add());
         }
@@ -325,6 +334,11 @@ void gen(Node *node)
     case ND_LT:
         printf(" cmp rax, rdi\n");
         printf(" setl al\n");
+        printf(" movzb rax, al\n");
+        break;
+    case ND_LEQ:
+        printf(" cmp rax, rdi\n");
+        printf(" setle al\n");
         printf(" movzb rax, al\n");
         break;
     }
