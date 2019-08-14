@@ -106,6 +106,7 @@ Token *tokenize(char *p)
 
     while (*p)
     {
+        //fprintf(stderr, "%c\n", *p);
         if (isspace(*p))
         {
             p++;
@@ -117,7 +118,7 @@ Token *tokenize(char *p)
             p += 2;
             continue;
         }
-        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=')
+        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';')
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
@@ -185,7 +186,10 @@ Node *equality()
         {
             node = new_node(ND_NEQ, node, relational());
         }
-        return node;
+        else
+        {
+            return node;
+        }
     }
 }
 

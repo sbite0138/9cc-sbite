@@ -51,6 +51,7 @@ struct Node
     int val; // kindがND_NUMの場合のみ使う
     int offset;
 };
+void error(char *fmt, ...);
 
 void program();
 Node *stmt();
