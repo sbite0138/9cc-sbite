@@ -158,7 +158,7 @@ Token *tokenize(char *p)
         }
         else if ((strncmp(p, "else", 4) == 0) && !is_alnum(p[4]))
         {
-            cur = new_token(TK_RETURN, cur, p, 4);
+            cur = new_token(TK_ELSE, cur, p, 4);
             p += 4;
             continue;
         }
@@ -219,14 +219,15 @@ Node *stmt()
         node->kind = ND_IF;
         node->lhs = expr();
         expect(")");
-        if (next()->kind != TK_ELSE)
+        Node *node_stmt_true = stmt();
+        if (consume_tokenkind(TK_ELSE))
         {
-            node->rhs = stmt();
+            node->kind = ND_IFELSE;
+            node->rhs = new_node(ND_IFELSE, node_stmt_true, stmt());
         }
         else
         {
-            node->kind = ND_IFELSE;
-            node->rhs = new_node(ND_IFELSE, stmt(), stmt());
+            node->rhs = node_stmt_true;
         }
         return node;
     }

@@ -42,7 +42,6 @@ try 1 "3>1;"
 try 1 "(3>1)==(1<3);"
 try 1 "1+2>1*2;"
 try 0 "1*2*3<1+2+3;"
-
 try 1 "2<=3;"
 try 1 "3>=1;"
 try 1 "(3>=1)==(1<=3);"
@@ -61,7 +60,9 @@ try 3 "if (2==1) return 2; return 3;"
 try 2 "if (1==1) return 2; return 3;"
 try 100 "a=10;if (a==10) a=a*10; return a;"
 try 11 "a=11;if (a==10) a=a*10; return a;"
-
-
+try 4 "a=1;if (a==1) a=a+1;if (a==2) a=a+1;if (a==3) a=a+1;if (a==3) a=a+1; return a;"
+try 1 "if (1==1)a=1;else a=2; return a; "
+try 3 "if (2==1)a=1;else if (1==2) a=2; else a=3; return a; "
+try 3 "if (2==1)a=1;else if (1==2) a=2; else if (1==1) a=3;else a=4; return a; "
 
 echo OK
