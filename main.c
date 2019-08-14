@@ -1,4 +1,5 @@
 #include "9cc.h"
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -7,6 +8,8 @@ int main(int argc, char *argv[])
         exit(1);
     }
     user_input = argv[1];
+    locals = calloc(1, sizeof(LVar));
+    locals->offset = 0;
     token = tokenize(argv[1]);
 
     program();
