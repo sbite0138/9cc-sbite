@@ -36,7 +36,9 @@ typedef enum
     ND_EQ,
     ND_NEQ,
     ND_LT,
-    ND_LEQ
+    ND_LEQ,
+    ND_ASSIGN,
+    ND_LVAR
 } NodeKind;
 
 typedef struct Node Node;
@@ -47,8 +49,13 @@ struct Node
     Node *lhs;
     Node *rhs;
     int val; // kindがND_NUMの場合のみ使う
+    int offset;
 };
+
+void program();
+Node *stmt();
 Node *expr();
+Node *assign();
 Node *equality();
 Node *relational();
 Node *add();
@@ -61,5 +68,6 @@ Token *tokenize(char *p);
 Node *expr();
 extern Token *token;
 extern char *user_input;
+extern Node *code[1024];
 
 #endif
