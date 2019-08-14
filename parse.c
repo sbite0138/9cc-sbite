@@ -186,7 +186,7 @@ Node *stmt()
 {
 
     Node *node;
-    if (consume(TK_RETURN))
+    if (consume_return())
     {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;

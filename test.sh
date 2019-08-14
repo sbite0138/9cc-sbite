@@ -53,7 +53,10 @@ try 3 "a=1;b=2;a+b;"
 try 4 "a=1;b=a;c=a*b+a;c+2;"
 try 3 "a=1;b=2;c=2*(a==b)+3*(a!=b);c;"
 try 3 "foo=1;bar=2;baz=2*(foo==bar)+3*(foo!=bar);baz;"
-try 100 "OKTHISISTHEVERYLONGLONGLONGNAME_____10101010aaaaaaaa=100;"
+try 100 "OKTHISISAVERYLONGLONGLONGNAME_____10101010aaaaaaaa=100;"
+try 0 "a=1;b=2;c=1+b+a/2;return 0;"
+try 3 "a=1;b=2;c=1+b+a/2;return c;"
+try 2 "return0= 1;return0=2;return return0;"
 
 
 
