@@ -30,7 +30,8 @@ typedef enum
     ND_DIV,
     ND_NUM,
     ND_EQ,
-    ND_NEQ
+    ND_NEQ,
+    ND_LT
 } NodeKind;
 
 typedef struct Node Node;
@@ -150,10 +151,9 @@ Token *tokenize(char *p)
             p += 2;
             continue;
         }
-        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')')
+        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>')
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
-
             continue;
         }
         if (isdigit(*p))
@@ -170,6 +170,7 @@ Token *tokenize(char *p)
 
 Node *expr();
 Node *equality();
+Node *relational();
 Node *add();
 Node *mul();
 Node *unary();
@@ -182,18 +183,39 @@ Node *expr()
 
 Node *equality()
 {
-    Node *node = add();
+    Node *node = relational();
     for (;;)
     {
         if (consume("=="))
         {
-            node = new_node(ND_EQ, node, add());
+
+            node = new_node(ND_EQ, node, relational());
         }
         else if (consume("!="))
         {
-            node = new_node(ND_NEQ, node, add());
+            node = new_node(ND_NEQ, node, relational());
         }
         return node;
+    }
+}
+
+Node *relational()
+{
+    Node *node = add();
+    for (;;)
+    {
+        if (consume("<"))
+        {
+            node = new_node(ND_LT, node, add());
+        }
+        else if (consume(">"))
+        {
+            node = new_node(ND_LT, add(), node);
+        }
+        else
+        {
+            return node;
+        }
     }
 }
 
@@ -298,6 +320,11 @@ void gen(Node *node)
     case ND_NEQ:
         printf(" cmp rax, rdi\n");
         printf(" setne al\n");
+        printf(" movzb rax, al\n");
+        break;
+    case ND_LT:
+        printf(" cmp rax, rdi\n");
+        printf(" setl al\n");
         printf(" movzb rax, al\n");
         break;
     }
