@@ -29,6 +29,7 @@ typedef enum
     ND_MUL,
     ND_DIV,
     ND_NUM,
+    ND_EQ
 } NodeKind;
 
 typedef struct Node Node;
@@ -146,6 +147,7 @@ Token *tokenize(char *p)
         {
             cur = new_token(TK_RESERVED, cur, p, 2);
             p += 2;
+            continue;
         }
         else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')')
         {
@@ -166,11 +168,31 @@ Token *tokenize(char *p)
 }
 
 Node *expr();
+Node *equality();
+Node *add();
 Node *mul();
 Node *unary();
 Node *term();
 
 Node *expr()
+{
+    return equality();
+}
+
+Node *equality()
+{
+    Node *node = add();
+    for (;;)
+    {
+        if (consume("=="))
+        {
+            node = new_node(ND_EQ, node, add());
+        }
+        return node;
+    }
+}
+
+Node *add()
 {
     Node *node = mul();
     for (;;)
@@ -262,6 +284,11 @@ void gen(Node *node)
     case ND_DIV:
         printf(" cqo\n");
         printf(" idiv rdi\n");
+        break;
+    case ND_EQ:
+        printf(" cmp rax, rdi\n");
+        printf(" sete al\n");
+        printf(" movzb rax, al\n");
         break;
     }
     printf(" push rax\n");
