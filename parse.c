@@ -53,9 +53,9 @@ bool consume(char *op)
     return true;
 }
 
-bool consume_return()
+bool consume_tokenkind(TokenKind kind)
 {
-    if (token->kind != TK_RETURN)
+    if (token->kind != kind)
     {
         return false;
     }
@@ -97,6 +97,14 @@ int expect_number()
 bool at_eof()
 {
     return token->kind == TK_EOF;
+}
+Token *next()
+{
+    if (at_eof())
+    {
+        error("プログラムの終端でnext()が呼ばれました\n");
+    }
+    return token->next;
 }
 
 bool is_alnum(char c)
@@ -140,6 +148,18 @@ Token *tokenize(char *p)
         else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';')
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
+            continue;
+        }
+        else if ((strncmp(p, "if", 2) == 0) && !is_alnum(p[2]))
+        {
+            cur = new_token(TK_IF, cur, p, 2);
+            p += 2;
+            continue;
+        }
+        else if ((strncmp(p, "else", 4) == 0) && !is_alnum(p[4]))
+        {
+            cur = new_token(TK_RETURN, cur, p, 4);
+            p += 4;
             continue;
         }
         else if ((strncmp(p, "return", 6) == 0) && !is_alnum(p[6]))
@@ -186,11 +206,29 @@ Node *stmt()
 {
 
     Node *node;
-    if (consume_return())
+    if (consume_tokenkind(TK_RETURN))
     {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = expr();
+    }
+    else if (consume_tokenkind(TK_IF))
+    {
+        expect("(");
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_IF;
+        node->lhs = expr();
+        expect(")");
+        if (next()->kind != TK_ELSE)
+        {
+            node->rhs = stmt();
+        }
+        else
+        {
+            node->kind = ND_IFELSE;
+            node->rhs = new_node(ND_IFELSE, stmt(), stmt());
+        }
+        return node;
     }
     else
     {

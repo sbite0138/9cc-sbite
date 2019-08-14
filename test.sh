@@ -57,7 +57,10 @@ try 100 "OKTHISISAVERYLONGLONGLONGNAME_____10101010aaaaaaaa=100;"
 try 0 "a=1;b=2;c=1+b+a/2;return 0;"
 try 3 "a=1;b=2;c=1+b+a/2;return c;"
 try 2 "return0= 1;return0=2;return return0;"
-
+try 3 "if (2==1) return 2; return 3;"
+try 2 "if (1==1) return 2; return 3;"
+try 100 "a=10;if (a==10) a=a*10; return a;"
+try 11 "a=11;if (a==10) a=a*10; return a;"
 
 
 

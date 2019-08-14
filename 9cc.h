@@ -12,6 +12,8 @@ typedef enum
     TK_RESERVED,
     TK_IDENT,
     TK_NUM,
+    TK_IF,
+    TK_ELSE,
     TK_RETURN,
     TK_EOF
 } TokenKind;
@@ -40,6 +42,8 @@ typedef enum
     ND_LEQ,
     ND_ASSIGN,
     ND_LVAR,
+    ND_IF,
+    ND_IFELSE,
     ND_RETURN
 } NodeKind;
 
@@ -85,5 +89,5 @@ extern Token *token;
 extern char *user_input;
 extern Node *code[1024];
 extern LVar *locals;
-
+extern int label;
 #endif
