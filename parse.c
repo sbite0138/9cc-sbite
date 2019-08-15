@@ -145,7 +145,7 @@ Token *tokenize(char *p)
             p += 2;
             continue;
         }
-        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';')
+        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';')
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
@@ -352,6 +352,10 @@ Node *mul()
         else if (consume("/"))
         {
             node = new_node(ND_DIV, node, unary());
+        }
+        else if (consume("%"))
+        {
+            node = new_node(ND_MOD, node, unary());
         }
         else
         {

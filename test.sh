@@ -64,5 +64,6 @@ try 4 "a=1;if (a==1) a=a+1;if (a==2) a=a+1;if (a==3) a=a+1;if (a==3) a=a+1; retu
 try 1 "if (1==1)a=1;else a=2; return a; "
 try 3 "if (2==1)a=1;else if (1==2) a=2; else a=3; return a; "
 try 3 "if (2==1)a=1;else if (1==2) a=2; else if (1==1) a=3;else a=4; return a; "
-
+try 3 "9%6;"
+try 1 "a=27;count=0;while(a!=1)if (a%2==0) a=a/2;else a=3*a+1;return a;"
 echo OK
