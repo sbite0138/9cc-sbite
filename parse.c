@@ -98,13 +98,23 @@ bool at_eof()
 {
     return token->kind == TK_EOF;
 }
-Token *next()
+Token *next_token()
 {
     if (at_eof())
     {
-        error("プログラムの終端でnext()が呼ばれました\n");
+        error("プログラムの終端でnext_token()が呼ばれました\n");
     }
     return token->next;
+}
+
+//現在のトークンのstrがopで指定したものか調べる関数
+bool check_token(char *op)
+{
+    if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len))
+    {
+        return false;
+    }
+    return true;
 }
 
 bool is_alnum(char c)
@@ -166,6 +176,12 @@ Token *tokenize(char *p)
         {
             cur = new_token(TK_WHILE, cur, p, 5);
             p += 5;
+            continue;
+        }
+        else if ((strncmp(p, "for", 3) == 0) && !is_alnum(p[3]))
+        {
+            cur = new_token(TK_FOR, cur, p, 3);
+            p += 3;
             continue;
         }
         else if ((strncmp(p, "return", 6) == 0) && !is_alnum(p[6]))
@@ -245,6 +261,54 @@ Node *stmt()
         node->lhs = expr();
         expect(")");
         node->rhs = stmt();
+        return node;
+    }
+    else if (consume_tokenkind(TK_FOR))
+    {
+        expect("(");
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_FOR;
+
+        //for (A;B;C) D; のA,Bを格納するノード
+        Node *node_init_cond = calloc(1, sizeof(Node));
+
+        //for (A;B;C) D; のC,Dを格納するノード
+        Node *node_update_stmt = calloc(1, sizeof(Node));
+        if (!check_token(";"))
+        {
+            node_init_cond->lhs = expr();
+        }
+        else
+        {
+
+            node_init_cond->lhs = NULL;
+        }
+        consume(";");
+
+        if (!check_token(";"))
+        {
+            node_init_cond->rhs = expr();
+        }
+        else
+        {
+            node_init_cond->rhs = NULL;
+        }
+        consume(";");
+
+        if (!check_token(")"))
+        {
+            node_update_stmt->lhs = expr();
+        }
+        else
+        {
+            node_update_stmt->lhs = NULL;
+        }
+        consume(";");
+
+        expect(")");
+        node_update_stmt->rhs = stmt();
+        node->lhs = node_init_cond;
+        node->rhs = node_update_stmt;
         return node;
     }
     else

@@ -66,4 +66,10 @@ try 3 "if (2==1)a=1;else if (1==2) a=2; else a=3; return a; "
 try 3 "if (2==1)a=1;else if (1==2) a=2; else if (1==1) a=3;else a=4; return a; "
 try 3 "9%6;"
 try 1 "a=27;count=0;while(a!=1)if (a%2==0) a=a/2;else a=3*a+1;return a;"
+try 55 "sum=0;for (a=1;a<=10;a=a+1)sum=sum+a;return sum;"
+try 55 "sum=0;a=1;for (;a<=10;a=a+1)sum=sum+a;return sum;"
+try 55 "sum=0;a=1;for (;;a=a+1)if (a==55) return a;return 0;"
+try 55 "sum=0;a=1;for (;;)if (a==55) return a;else a=a+1;return 0;"
+try 55 "sum=0;a=1;for (;a<55;)if (0==55) return a;else a=a+1;return a;"
+
 echo OK

@@ -16,6 +16,7 @@ typedef enum
     TK_ELSE,
     TK_WHILE,
     TK_RETURN,
+    TK_FOR,
     TK_EOF
 } TokenKind;
 
@@ -47,6 +48,8 @@ typedef enum
     ND_IF,
     ND_IFELSE,
     ND_WHILE,
+    ND_FOR,
+    ND_NOP,
     ND_RETURN
 } NodeKind;
 
