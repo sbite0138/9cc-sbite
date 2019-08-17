@@ -41,6 +41,13 @@ void gen(Node *node)
         printf("  pop rbp\n");
         printf("  ret\n");
         return;
+
+    /*
+    stmtから変換される処理には、最後に結果をスタックにpushするもの(=,+,==など)と、本来はしないもの(for,while,{}など)がある。
+    この2つがごちゃまぜになっていると、スタックがオーバーフローしたり、必要な情報までpopしたりする。
+    そこで、stmtから変換される命令は、全て何らかの値をpushし、また、stmtをgen()したあとは、必ずpop raxを行うことにした。
+    これ以降のコードに出てくる push 0xBEEFは、本来値をpushしない命令が仮にpushする値となっている。
+    */
     case ND_IF:
         label++;
         current_label = label;
