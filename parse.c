@@ -155,7 +155,7 @@ Token *tokenize(char *p)
             p += 2;
             continue;
         }
-        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';')
+        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}')
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
@@ -230,9 +230,14 @@ Node *stmt()
     Node *node;
     if (consume_tokenkind(TK_RETURN))
     {
+        //fprintf(stderr, "%s\n", token->str);
+
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = expr();
+        //fprintf(stderr, "%s\n", token->str);
+        expect(";");
+        return node;
     }
     else if (consume_tokenkind(TK_IF))
     {
@@ -311,12 +316,43 @@ Node *stmt()
         node->rhs = node_update_stmt;
         return node;
     }
+    else if (consume("{"))
+    {
+        node = calloc(1, sizeof(Node));
+        node->kind = ND_BLOCK;
+        node->block = calloc(1, sizeof(Block));
+
+        Block *current_block = node->block;
+        //current_block->stmt_node = calloc(1, sizeof(Node));
+        //current_block->next = calloc(1, sizeof(Block));
+
+        for (;;)
+        {
+            current_block->stmt_node = stmt();
+            if (consume("}"))
+                break;
+            current_block = new_block(current_block);
+        }
+        current_block->next = NULL;
+        //exit(1);
+
+        current_block = node->block;
+        while (current_block != NULL)
+        {
+            //fprintf(stderr, "%p %d\n", current_block, current_block->stmt_node->kind == ND_ASSIGN);
+            //current_block = current_block->next;
+            current_block = next_block(current_block);
+        }
+        //exit(1);
+        return node;
+    }
     else
     {
         node = expr();
+        expect(";");
+        return node;
     }
-    expect(";");
-    return node;
+    error("stmtで解釈できません:%s\n", token->str);
 }
 
 Node *expr()

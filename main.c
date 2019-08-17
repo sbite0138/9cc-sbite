@@ -11,8 +11,9 @@ int main(int argc, char *argv[])
     locals = calloc(1, sizeof(LVar));
     locals->offset = 0;
     token = tokenize(argv[1]);
-
+    //fprintf(stderr, "tokenize() done\n");
     program();
+    //fprintf(stderr, "program() done\n");
     printf(".intel_syntax noprefix\n");
     printf(".global main\n");
     printf("main:\n");
@@ -23,6 +24,7 @@ int main(int argc, char *argv[])
     for (; code[i]; i++)
     {
         gen(code[i]);
+        //fprintf(stderr, "gen(code[%d]) done\n", i);
         printf("  pop rax\n");
     }
     printf("  mov rsp,rbp\n");

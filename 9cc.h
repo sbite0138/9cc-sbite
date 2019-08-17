@@ -49,17 +49,25 @@ typedef enum
     ND_IFELSE,
     ND_WHILE,
     ND_FOR,
-    ND_NOP,
+    ND_BLOCK,
     ND_RETURN
 } NodeKind;
 
 typedef struct Node Node;
+
+typedef struct Block Block;
+struct Block
+{
+    Node *stmt_node;
+    Block *next;
+};
 
 struct Node
 {
     NodeKind kind;
     Node *lhs;
     Node *rhs;
+    Block *block;
     int val;    // kindがND_NUMの場合のみ使う
     int offset; // kindがND_LVARの場合のみ使う
 };
@@ -90,6 +98,8 @@ Token *tokenize(char *p);
 Node *expr();
 
 LVar *find_lvar(Token *tok);
+Block *new_block(Block *cur);
+Block *next_block(Block *block);
 
 extern Token *token;
 extern char *user_input;

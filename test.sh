@@ -71,5 +71,8 @@ try 55 "sum=0;a=1;for (;a<=10;a=a+1)sum=sum+a;return sum;"
 try 55 "sum=0;a=1;for (;;a=a+1)if (a==55) return a;return 0;"
 try 55 "sum=0;a=1;for (;;)if (a==55) return a;else a=a+1;return 0;"
 try 55 "sum=0;a=1;for (;a<55;)if (0==55) return a;else a=a+1;return a;"
-
+try 0 "a=0;i=0;for (i=0;i<65536*16;i=i+1){a=0;}return 0; "
+try 50 "a=0;i=0;for (i=0;i<10;i=i+1){a=a+1;a=a+1;a=a+1;a=a+1;a=a+1;}return a;"
+try 0 "a=0;i=0;{{{{{{{{0;}}}}}}}}return 0;"
+try 111 "a=27;count=0;while (a!=1){if (a%2==0){a=a/2;}else{a=3*a+1;}count=count+1;}return count;"
 echo OK

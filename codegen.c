@@ -13,6 +13,8 @@ void gen_lval(Node *node)
 void gen(Node *node)
 {
     int current_label;
+    Block *node_block = node->block;
+
     switch (node->kind)
     {
     case ND_NUM:
@@ -27,7 +29,6 @@ void gen(Node *node)
     case ND_ASSIGN:
         gen_lval(node->lhs);
         gen(node->rhs);
-
         printf("  pop rdi\n");
         printf("  pop rax\n");
         printf("  mov [rax], rdi\n");
@@ -48,7 +49,9 @@ void gen(Node *node)
         printf("  cmp rax,0 \n");
         printf("  je .Lend%03d\n", current_label);
         gen(node->rhs);
+        printf("  pop rax\n");
         printf(".Lend%03d:\n", current_label);
+        printf("  push 0xBEEF\n");
         return;
     case ND_IFELSE:
         label++;
@@ -58,10 +61,13 @@ void gen(Node *node)
         printf("  cmp rax,0 \n");
         printf("  je .Lelse%03d\n", current_label);
         gen(node->rhs->lhs);
+        printf("  pop rax\n");
         printf("  jmp .Lend%03d\n", current_label);
         printf(".Lelse%03d:\n", current_label);
         gen(node->rhs->rhs);
+        printf("  pop rax\n");
         printf(".Lend%03d:\n", current_label);
+        printf("  push 0xBEEF\n");
         return;
     case ND_WHILE:
         label++;
@@ -72,8 +78,10 @@ void gen(Node *node)
         printf("  cmp rax,0 \n");
         printf("  je .Lend%03d\n", current_label);
         gen(node->rhs);
+        printf("  pop rax\n");
         printf("  jmp .Lbegin%03d\n", current_label);
         printf(".Lend%03d:\n", current_label);
+        printf("  push 0xBEEF\n");
         return;
     case ND_FOR:
         label++;
@@ -97,6 +105,8 @@ void gen(Node *node)
         //fprintf(stdout, ";gen rhs->rhs\n");
 
         gen(node->rhs->rhs);
+        printf("  pop rax\n");
+
         if (node->rhs->lhs != NULL)
         {
             //fprintf(stdout, ";gen rhs->lhs\n");
@@ -105,6 +115,22 @@ void gen(Node *node)
         }
         printf("  jmp .Lbegin%03d\n", current_label);
         printf(".Lend%03d:\n", current_label);
+        printf("  push 0xBEEF\n");
+
+        return;
+    case ND_BLOCK:
+        while (node_block)
+        {
+            //fprintf(stderr, "%p\n", node_block);
+            //fprintf(stderr, "%p\n", node_block->stmt_node);
+
+            gen(node_block->stmt_node);
+            printf("pop rax\n");
+
+            node_block = node_block->next;
+        }
+        printf("  push 0xBEEF\n");
+
         return;
     }
     gen(node->lhs);

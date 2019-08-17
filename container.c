@@ -12,3 +12,15 @@ LVar *find_lvar(Token *tok)
     }
     return NULL;
 }
+
+Block *new_block(Block *cur)
+{
+    Block *new_block = calloc(1, sizeof(Block));
+    cur->next = new_block;
+    return new_block;
+}
+
+Block *next_block(Block *block)
+{
+    return block->next;
+}
