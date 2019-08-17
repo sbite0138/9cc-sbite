@@ -323,27 +323,21 @@ Node *stmt()
         node->block = calloc(1, sizeof(Block));
 
         Block *current_block = node->block;
-        //current_block->stmt_node = calloc(1, sizeof(Node));
-        //current_block->next = calloc(1, sizeof(Block));
-
-        for (;;)
+        if (!(consume("}")))
         {
-            current_block->stmt_node = stmt();
-            if (consume("}"))
-                break;
-            current_block = new_block(current_block);
+            for (;;)
+            {
+                current_block->stmt_node = stmt();
+                if (consume("}"))
+                    break;
+                current_block = new_block(current_block);
+            }
+            current_block->next = NULL;
         }
-        current_block->next = NULL;
-        //exit(1);
-
-        current_block = node->block;
-        while (current_block != NULL)
+        else
         {
-            //fprintf(stderr, "%p %d\n", current_block, current_block->stmt_node->kind == ND_ASSIGN);
-            //current_block = current_block->next;
-            current_block = next_block(current_block);
+            node->block = NULL;
         }
-        //exit(1);
         return node;
     }
     else
