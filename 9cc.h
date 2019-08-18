@@ -45,6 +45,7 @@ typedef enum
     ND_LEQ,
     ND_ASSIGN,
     ND_LVAR,
+    ND_FUNC,
     ND_IF,
     ND_IFELSE,
     ND_WHILE,
@@ -68,8 +69,10 @@ struct Node
     Node *lhs;
     Node *rhs;
     Block *block;
-    int val;    // kindがND_NUMの場合のみ使う
-    int offset; // kindがND_LVARの場合のみ使う
+    int val;         // kindがND_NUMの場合のみ使う
+    int offset;      // kindがND_LVARの場合のみ使う
+    char *funcname;  //kindがND_FUNCの場合のみ使う
+    int funcnamelen; ////kindがND_FUNCの場合のみ使う
 };
 typedef struct LVar LVar;
 struct LVar

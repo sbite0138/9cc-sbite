@@ -4,7 +4,7 @@ try() {
   input="$2"
 
   ./9cc "$input" > tmp.s
-  gcc -o tmp tmp.s
+  gcc -o tmp tmp.s helper.o
   ./tmp
   actual="$?"
 
@@ -75,4 +75,5 @@ try 0 "a=0;i=0;for (i=0;i<65536*16;i=i+1){a=0;}return 0; "
 try 50 "a=0;i=0;for (i=0;i<10;i=i+1){a=a+1;a=a+1;a=a+1;a=a+1;a=a+1;}return a;"
 try 0 "a=0;i=0;{{{{{{{{0;}}}}}}}}return 0;"
 try 111 "a=27;count=0;while (a!=1){if (a%2==0){a=a/2;}else{a=3*a+1;}count=count+1;}return count;"
+
 echo OK

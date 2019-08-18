@@ -14,6 +14,7 @@ void gen(Node *node)
 {
     int current_label;
     Block *node_block = node->block;
+    char *name = calloc(128, sizeof(char));
 
     switch (node->kind)
     {
@@ -33,6 +34,11 @@ void gen(Node *node)
         printf("  pop rax\n");
         printf("  mov [rax], rdi\n");
         printf("  push rdi\n");
+        return;
+    case ND_FUNC:
+        strncpy(name, node->funcname, node->funcnamelen);
+        printf("  call %s\n", name);
+        printf("  push 0xBEEF\n");
         return;
     case ND_RETURN:
         gen(node->lhs);
