@@ -38,7 +38,7 @@ void gen(Node *node)
     case ND_FUNC:
         strncpy(name, node->funcname, node->funcnamelen);
         printf("  call %s\n", name);
-        printf("  push 0xBEEF\n");
+        printf("  push rax\n");
         return;
     case ND_RETURN:
         gen(node->lhs);
