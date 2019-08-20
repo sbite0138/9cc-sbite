@@ -1,5 +1,7 @@
 #include "9cc.h"
 int label;
+char **arg_reg;
+
 void gen_lval(Node *node)
 {
     if (node->kind != ND_LVAR)
@@ -12,8 +14,11 @@ void gen_lval(Node *node)
 }
 void gen(Node *node)
 {
+
     int current_label;
     Block *node_block = node->block;
+    Arg *node_args = node->args;
+
     char *name = calloc(128, sizeof(char));
 
     switch (node->kind)
@@ -36,6 +41,20 @@ void gen(Node *node)
         printf("  push rdi\n");
         return;
     case ND_FUNC:
+        for (int i = 0; node_args; i++)
+        {
+
+            gen(node_args->node);
+
+            printf("  pop rax\n");
+
+            printf("  mov %s, rax\n", arg_reg[i]);
+
+            node_args = node_args->next;
+            //fprintf(stderr, "hoge");
+        }
+        //fprintf(stderr, "done\n");
+
         strncpy(name, node->funcname, node->funcnamelen);
         printf("  call %s\n", name);
         printf("  push rax\n");

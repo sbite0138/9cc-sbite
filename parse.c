@@ -155,7 +155,7 @@ Token *tokenize(char *p)
             p += 2;
             continue;
         }
-        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}')
+        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',')
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
@@ -485,9 +485,28 @@ Node *term()
         if (consume("("))
         {
             Node *node = calloc(1, sizeof(Node));
+            node->args = calloc(1, sizeof(Arg));
             node->kind = ND_FUNC;
             node->funcname = tok->str;
             node->funcnamelen = tok->len;
+            Arg *curarg = node->args;
+            if (!check_token(")"))
+            {
+                for (;;)
+                {
+
+                    curarg->node = expr();
+                    //curarg->node->kind = ND_NUM;
+                    if (!consume(","))
+                        break;
+                    curarg = new_arg(curarg);
+                }
+                curarg->next = NULL;
+            }
+            else
+            {
+                node->args = NULL;
+            }
             expect(")");
 
             return node;

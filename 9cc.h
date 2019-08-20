@@ -55,13 +55,9 @@ typedef enum
 } NodeKind;
 
 typedef struct Node Node;
-
 typedef struct Block Block;
-struct Block
-{
-    Node *stmt_node;
-    Block *next;
-};
+typedef struct LVar LVar;
+typedef struct Arg Arg;
 
 struct Node
 {
@@ -72,15 +68,26 @@ struct Node
     int val;         // kindがND_NUMの場合のみ使う
     int offset;      // kindがND_LVARの場合のみ使う
     char *funcname;  //kindがND_FUNCの場合のみ使う
-    int funcnamelen; ////kindがND_FUNCの場合のみ使う
+    int funcnamelen; //kindがND_FUNCの場合のみ使う
+    Arg *args;       //kindがND_FUNCの場合のみ使う
 };
-typedef struct LVar LVar;
+struct Block
+{
+    Node *stmt_node;
+    Block *next;
+};
+
 struct LVar
 {
     LVar *next;
     char *name;
     int len;
     int offset;
+};
+struct Arg
+{
+    Node *node;
+    Arg *next;
 };
 
 void error(char *fmt, ...);
@@ -103,10 +110,13 @@ Node *expr();
 LVar *find_lvar(Token *tok);
 Block *new_block(Block *cur);
 Block *next_block(Block *block);
+Arg *new_arg(Arg *cur);
+Arg *next_arg(Arg *cur);
 
 extern Token *token;
 extern char *user_input;
 extern Node *code[1024];
 extern LVar *locals;
 extern int label;
+extern char **arg_reg;
 #endif

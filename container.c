@@ -15,12 +15,24 @@ LVar *find_lvar(Token *tok)
 
 Block *new_block(Block *cur)
 {
-    Block *new_block = calloc(1, sizeof(Block));
-    cur->next = new_block;
-    return new_block;
+    Block *new = calloc(1, sizeof(Block));
+    cur->next = new;
+    return new;
 }
 
-Block *next_block(Block *block)
+Block *next_block(Block *cur)
 {
-    return block->next;
+    return cur->next;
+}
+
+Arg *new_arg(Arg *cur)
+{
+    Arg *new = calloc(1, sizeof(Arg));
+    cur->next = new;
+    return new;
+}
+
+Arg *next_arg(Arg *cur)
+{
+    return cur->next;
 }

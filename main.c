@@ -12,6 +12,14 @@ int main(int argc, char *argv[])
     locals->offset = 0;
     token = tokenize(argv[1]);
     //fprintf(stderr, "tokenize() done\n");
+    arg_reg = (char **)calloc(6, 16 * sizeof(char));
+    arg_reg[0] = "rdi";
+    arg_reg[1] = "rsi";
+    arg_reg[2] = "rdx";
+    arg_reg[3] = "rcx";
+    arg_reg[4] = "r8";
+    arg_reg[5] = "r9";
+
     program();
     //fprintf(stderr, "program() done\n");
     printf(".intel_syntax noprefix\n");
@@ -23,6 +31,7 @@ int main(int argc, char *argv[])
     int i = 0;
     for (; code[i]; i++)
     {
+
         gen(code[i]);
         //fprintf(stderr, "gen(code[%d]) done\n", i);
         printf("  pop rax\n");
