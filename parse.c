@@ -98,13 +98,13 @@ bool at_eof()
 {
     return token->kind == TK_EOF;
 }
-Token *next_token()
+void next_token()
 {
     if (at_eof())
     {
         error("プログラムの終端でnext_token()が呼ばれました\n");
     }
-    return token->next;
+    token = token->next;
 }
 
 //現在のトークンのstrがopで指定したものか調べる関数
@@ -219,9 +219,30 @@ void program()
     int i = 0;
     while (!at_eof())
     {
+
         code[i++] = stmt();
     }
     code[i] = NULL;
+}
+
+Node *func()
+{
+    Node *node = calloc(1, sizeof(Node));
+    node->kind = ND_FUNC;
+    node->funcname = token->str;
+    node->funcnamelen = token->len;
+    next_token();
+    expect("(");
+    while (true)
+    {
+
+        if (!consume(","))
+        {
+            break;
+        }
+    }
+    Node *args;
+    args->kind = ND_LVAR;
 }
 
 Node *stmt()

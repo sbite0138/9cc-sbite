@@ -45,6 +45,7 @@ typedef enum
     ND_LEQ,
     ND_ASSIGN,
     ND_LVAR,
+    ND_FUNC,
     ND_CALL,
     ND_IF,
     ND_IFELSE,
@@ -67,9 +68,9 @@ struct Node
     Block *block;
     int val;         // kindがND_NUMの場合のみ使う
     int offset;      // kindがND_LVARの場合のみ使う
-    char *funcname;  //kindがND_CALLの場合のみ使う
-    int funcnamelen; //kindがND_CALLの場合のみ使う
-    Arg *args;       //kindがND_CALLの場合のみ使う
+    char *funcname;  //kindがND_CALLまたはND_FUNCの場合のみ使う
+    int funcnamelen; //kindがND_CALLまたはND_FUNCの場合のみ使う
+    Arg *args;       //kindがND_CALLまたはND_FUNCの場合のみ使う
 };
 struct Block
 {
