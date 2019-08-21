@@ -44,6 +44,8 @@ typedef enum
     ND_LT,
     ND_LEQ,
     ND_ASSIGN,
+    ND_ADDR,
+    ND_DEREF,
     ND_LVAR,
     ND_FUNC,
     ND_CALL,

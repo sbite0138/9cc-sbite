@@ -156,7 +156,7 @@ Token *tokenize(char *p)
             p += 2;
             continue;
         }
-        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',')
+        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',' || *p == '&')
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
@@ -510,6 +510,21 @@ Node *unary()
     if (consume("-"))
     {
         return new_node(ND_SUB, new_node_num(0), term());
+    }
+    if (consume("&"))
+    {
+        Node *node = calloc(1, sizeof(Node));
+        node->kind = ND_ADDR;
+        node->rhs = unary();
+        return node;
+    }
+
+    if (consume("*"))
+    {
+        Node *node = calloc(1, sizeof(Node));
+        node->kind = ND_DEREF;
+        node->rhs = unary();
+        return node;
     }
     return term();
 }

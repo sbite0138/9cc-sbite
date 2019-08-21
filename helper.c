@@ -32,6 +32,11 @@ int print_num(int n)
     printf("%d\n", n);
     return 0;
 }
+int print_addr(int n)
+{
+    printf("%p\n", n);
+    return 0;
+}
 
 int print_char(int n)
 {

@@ -80,5 +80,6 @@ try 21  "main(){ a=1; return mulab(21,a); }"
 try 9 "main(){ return (fib(32))%100;} fib(n){if (n<=2) return 1; return fib(n-1)+fib(n-2);}"
 try 10 "main(){ return sub(16,6);} sub(first,second){return first-second;}"
 try 0 "main(){ for (i=0;i<65536;i=i+1) sub(16,6); return 0;} sub(first,second){return first-second;}"
-
+try 42 "main(){x=42;y=&x;return *y;}"
+try 42 "main(){x=42;y=1111;z=&y+8;return *z;}"
 echo OK
