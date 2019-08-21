@@ -2,6 +2,7 @@
 Token *token;
 char *user_input;
 Node *code[1024];
+LVar *func_variables[256];
 
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
@@ -216,12 +217,18 @@ Token *tokenize(char *p)
 
 void program()
 {
+
     int i = 0;
     while (!at_eof())
     {
 
-        code[i++] = stmt();
+        locals = calloc(1, sizeof(LVar));
+        locals->offset = 0;
+        code[i] = func();
+        func_variables[i] = locals;
+        i += 1;
     }
+
     code[i] = NULL;
 }
 
@@ -231,18 +238,33 @@ Node *func()
     node->kind = ND_FUNC;
     node->funcname = token->str;
     node->funcnamelen = token->len;
+    node->argnum = 0;
+    Node *cur = node;
     next_token();
     expect("(");
-    while (true)
+    if (!consume(")"))
     {
-
-        if (!consume(","))
+        for (;;)
         {
-            break;
+
+            LVar *lvar = calloc(1, sizeof(LVar));
+            lvar->next = locals;
+            lvar->name = token->str;
+            lvar->len = token->len;
+            lvar->offset = locals->offset + 8;
+            locals = lvar;
+            node->argnum += 1;
+            next_token();
+
+            if (!consume(","))
+            {
+                break;
+            }
         }
+        expect(")");
     }
-    Node *args;
-    args->kind = ND_LVAR;
+    node->rhs = stmt();
+    return node;
 }
 
 Node *stmt()

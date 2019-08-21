@@ -70,7 +70,8 @@ struct Node
     int offset;      // kindがND_LVARの場合のみ使う
     char *funcname;  //kindがND_CALLまたはND_FUNCの場合のみ使う
     int funcnamelen; //kindがND_CALLまたはND_FUNCの場合のみ使う
-    Arg *args;       //kindがND_CALLまたはND_FUNCの場合のみ使う
+    Arg *args;       //kindがND_CALLの場合のみ使う
+    int argnum;      //kindがND_FUNCの場合のみ使う
 };
 struct Block
 {
@@ -94,6 +95,7 @@ struct Arg
 void error(char *fmt, ...);
 
 void program();
+Node *func();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -117,6 +119,7 @@ Arg *next_arg(Arg *cur);
 extern Token *token;
 extern char *user_input;
 extern Node *code[1024];
+extern LVar *func_variables[256];
 extern LVar *locals;
 extern int label;
 extern char **arg_reg;

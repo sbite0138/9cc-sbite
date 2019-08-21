@@ -1,4 +1,5 @@
 #include "9cc.h"
+
 LVar *locals;
 LVar *find_lvar(Token *tok)
 {

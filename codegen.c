@@ -23,6 +23,25 @@ void gen(Node *node)
 
     switch (node->kind)
     {
+    case ND_FUNC:
+        strncpy(name, node->funcname, node->funcnamelen);
+        printf(".global %s\n", name);
+        printf("%s:\n", name);
+        printf("  push rbp\n");
+        printf("  mov rbp, rsp\n");
+        printf("  sub rsp, 208\n");
+        for (int i = 0; i < node->argnum; i++)
+        {
+            printf("  mov rax,  rbp\n");
+            printf("  sub rax,  %d\n", 8 + i * 8); //char型に対応はできてない…
+            printf("  mov [rax],  %s\n", arg_reg[i]);
+        }
+        gen(node->rhs);
+        printf("  mov rsp,rbp\n");
+        printf("  pop rbp\n");
+        printf("  ret\n");
+
+        return;
     case ND_NUM:
         printf("  push %d\n", node->val);
         return;
@@ -157,7 +176,7 @@ void gen(Node *node)
             //fprintf(stderr, "%p\n", node_block->stmt_node);
 
             gen(node_block->stmt_node);
-            printf("pop rax\n");
+            printf("  pop rax\n");
 
             node_block = node_block->next;
         }
