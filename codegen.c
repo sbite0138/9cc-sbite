@@ -40,7 +40,7 @@ void gen(Node *node)
         printf("  mov [rax], rdi\n");
         printf("  push rdi\n");
         return;
-    case ND_FUNC:
+    case ND_CALL:
         for (int i = 0; node_args; i++)
         {
 

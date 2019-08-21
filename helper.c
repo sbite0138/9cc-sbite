@@ -22,6 +22,11 @@ int avg(int a, int b)
     return (a + b) / 2;
 }
 
+int mulab(int a, int b)
+{
+    return a * b;
+}
+
 int print_num(int n)
 {
     printf("%d\n", n);

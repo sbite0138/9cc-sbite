@@ -486,7 +486,7 @@ Node *term()
         {
             Node *node = calloc(1, sizeof(Node));
             node->args = calloc(1, sizeof(Arg));
-            node->kind = ND_FUNC;
+            node->kind = ND_CALL;
             node->funcname = tok->str;
             node->funcnamelen = tok->len;
             Arg *curarg = node->args;
