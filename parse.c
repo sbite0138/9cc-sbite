@@ -253,6 +253,7 @@ void decl()
 
 Node *func()
 {
+    consume_tokenkind(TK_INT);
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_FUNC;
     node->funcname = token->str;
@@ -265,7 +266,7 @@ Node *func()
     {
         for (;;)
         {
-
+            consume_tokenkind(TK_INT);
             LVar *lvar = calloc(1, sizeof(LVar));
             lvar->next = locals;
             lvar->name = token->str;
