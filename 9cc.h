@@ -17,6 +17,7 @@ typedef enum
     TK_WHILE,
     TK_RETURN,
     TK_FOR,
+    TK_INT,
     TK_EOF
 } TokenKind;
 

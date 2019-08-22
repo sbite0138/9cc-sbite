@@ -191,6 +191,12 @@ Token *tokenize(char *p)
             p += 6;
             continue;
         }
+        else if ((strncmp(p, "int", 3) == 0) && !is_alnum(p[3]))
+        {
+            cur = new_token(TK_INT, cur, p, 3);
+            p += 3;
+            continue;
+        }
         else if (isalpha(*p))
         {
             int len = 0;
@@ -361,16 +367,61 @@ Node *stmt()
     }
     else if (consume("{"))
     {
+
+        /*
+        BLOCK*=
+            "{" (declval* stmt declval*)* "}" |
+            "{" (declval*) "}"
+        という構文になる
+        */
         node = calloc(1, sizeof(Node));
         node->kind = ND_BLOCK;
         node->block = calloc(1, sizeof(Block));
 
         Block *current_block = node->block;
+        while (consume_tokenkind(TK_INT))
+        {
+            LVar *lvar = calloc(1, sizeof(LVar));
+            lvar->next = locals;
+            lvar->name = token->str;
+            lvar->len = token->len;
+            lvar->offset = locals->offset + 8;
+            //node->offset = lvar->offset;
+            locals = lvar;
+            next_token();
+            expect(";");
+        }
         if (!(consume("}")))
         {
             for (;;)
             {
+                while (consume_tokenkind(TK_INT))
+                {
+                    LVar *lvar = calloc(1, sizeof(LVar));
+                    lvar->next = locals;
+                    lvar->name = token->str;
+                    lvar->len = token->len;
+                    lvar->offset = locals->offset + 8;
+                    //node->offset = lvar->offset;
+                    locals = lvar;
+                    next_token();
+                    expect(";");
+                }
                 current_block->stmt_node = stmt();
+
+                while (consume_tokenkind(TK_INT))
+                {
+                    LVar *lvar = calloc(1, sizeof(LVar));
+                    lvar->next = locals;
+                    lvar->name = token->str;
+                    lvar->len = token->len;
+                    lvar->offset = locals->offset + 8;
+                    //node->offset = lvar->offset;
+                    locals = lvar;
+                    next_token();
+                    expect(";");
+                }
+
                 if (consume("}"))
                     break;
                 current_block = new_block(current_block);
@@ -581,14 +632,9 @@ Node *term()
             }
             else
             {
-
-                lvar = calloc(1, sizeof(LVar));
-                lvar->next = locals;
-                lvar->name = tok->str;
-                lvar->len = tok->len;
-                lvar->offset = locals->offset + 8;
-                node->offset = lvar->offset;
-                locals = lvar;
+                char *name = calloc(128, sizeof(char));
+                strncpy(name, tok->str, tok->len);
+                error("定義されていない変数名です:%s\n", name);
             }
             return node;
         }
