@@ -238,6 +238,19 @@ void program()
     code[i] = NULL;
 }
 
+void decl()
+{
+    LVar *lvar = calloc(1, sizeof(LVar));
+    lvar->next = locals;
+    lvar->name = token->str;
+    lvar->len = token->len;
+    lvar->offset = locals->offset + 8;
+    //node->offset = lvar->offset;
+    locals = lvar;
+    next_token();
+    expect(";");
+}
+
 Node *func()
 {
     Node *node = calloc(1, sizeof(Node));
@@ -381,15 +394,7 @@ Node *stmt()
         Block *current_block = node->block;
         while (consume_tokenkind(TK_INT))
         {
-            LVar *lvar = calloc(1, sizeof(LVar));
-            lvar->next = locals;
-            lvar->name = token->str;
-            lvar->len = token->len;
-            lvar->offset = locals->offset + 8;
-            //node->offset = lvar->offset;
-            locals = lvar;
-            next_token();
-            expect(";");
+            decl();
         }
         if (!(consume("}")))
         {
@@ -397,29 +402,13 @@ Node *stmt()
             {
                 while (consume_tokenkind(TK_INT))
                 {
-                    LVar *lvar = calloc(1, sizeof(LVar));
-                    lvar->next = locals;
-                    lvar->name = token->str;
-                    lvar->len = token->len;
-                    lvar->offset = locals->offset + 8;
-                    //node->offset = lvar->offset;
-                    locals = lvar;
-                    next_token();
-                    expect(";");
+                    decl();
                 }
                 current_block->stmt_node = stmt();
 
                 while (consume_tokenkind(TK_INT))
                 {
-                    LVar *lvar = calloc(1, sizeof(LVar));
-                    lvar->next = locals;
-                    lvar->name = token->str;
-                    lvar->len = token->len;
-                    lvar->offset = locals->offset + 8;
-                    //node->offset = lvar->offset;
-                    locals = lvar;
-                    next_token();
-                    expect(";");
+                    decl();
                 }
 
                 if (consume("}"))
