@@ -241,6 +241,16 @@ void program()
 void decl()
 {
     LVar *lvar = calloc(1, sizeof(LVar));
+    lvar->type = calloc(1, sizeof(Type));
+    Type *cur = lvar->type;
+    while (consume("*"))
+    {
+        cur->ty = PTR;
+        Type *next = calloc(1, sizeof(Type));
+        cur->ptr_to = next;
+        cur = next;
+    }
+    cur->ty = INT;
     lvar->next = locals;
     lvar->name = token->str;
     lvar->len = token->len;

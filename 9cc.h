@@ -62,6 +62,16 @@ typedef struct Node Node;
 typedef struct Block Block;
 typedef struct LVar LVar;
 typedef struct Arg Arg;
+typedef struct Type Type;
+struct Type
+{
+    enum
+    {
+        INT,
+        PTR
+    } ty;
+    Type *ptr_to;
+};
 
 struct Node
 {
@@ -88,6 +98,7 @@ struct LVar
     char *name;
     int len;
     int offset;
+    Type *type;
 };
 struct Arg
 {
