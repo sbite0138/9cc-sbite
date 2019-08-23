@@ -82,4 +82,6 @@ try 10 "int main(){ return sub(16,6);} int sub(int first,int second){return firs
 try 0 "int main(){ int i;for (i=0;i<65536;i=i+1) sub(16,6); return 0;} int sub(int first,int second){return first-second;}"
 try 42 "int main(){int x; int y;x=42;y=&x;return *y;}"
 try 42 "int main(){int x;int y;int z;x=42;y=1111;z=&y+8;return *z;}"
+try 3 "int main(){int x;int *y;y=&x;*y=3;return x;}"
+try 42 "int main(){int x;int *y;int **z;  x=20; y=&x;*y=*y+20; z=&y;y=y; return **z+2;}"
 echo OK
