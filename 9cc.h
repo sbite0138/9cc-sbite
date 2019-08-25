@@ -85,6 +85,7 @@ struct Node
     int funcnamelen; //kindがND_CALLまたはND_FUNCの場合のみ使う
     Arg *args;       //kindがND_CALLの場合のみ使う
     int argnum;      //kindがND_FUNCの場合のみ使う
+    Type *type;      //kindがND_ADDまたはND_SUBのとき、その演算が何に対して行われるのか表す
 };
 struct Block
 {

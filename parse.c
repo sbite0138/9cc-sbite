@@ -10,6 +10,27 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
     node->kind = kind;
     node->lhs = lhs;
     node->rhs = rhs;
+    node->type = calloc(1, sizeof(Type));
+    //fprintf(stderr, "%s\n", token->str);
+    if (node->kind == ND_ADD || node->kind == ND_SUB)
+    {
+        //  fprintf(stderr, "%d %d\n", lhs->kind, rhs->kind);
+        // fprintf(stderr, "%p %p\n", lhs->type, rhs->type);
+
+        if (lhs->type->ty == PTR && rhs->type->ty == PTR)
+        {
+            error("ポインタ同士の加算/減算です:%s", token->str);
+        }
+        if (lhs->type->ty == INT && rhs->type->ty == INT)
+        {
+
+            node->type->ty = INT;
+        } //char入れたらこの後にも追加する
+        else
+        {
+            node->type->ty = PTR;
+        }
+    }
     return node;
 }
 
@@ -18,6 +39,8 @@ Node *new_node_num(int val)
     Node *node = calloc(1, sizeof(Node));
     node->kind = ND_NUM;
     node->val = val;
+    node->type = calloc(1, sizeof(Type));
+    node->type->ty = INT; // calloc(1, sizeof(Type));
     return node;
 }
 
@@ -278,6 +301,8 @@ Node *func()
         {
             consume_tokenkind(TK_INT);
             LVar *lvar = calloc(1, sizeof(LVar));
+            lvar->type = calloc(1, sizeof(Type));
+            lvar->type->ty = INT;
             lvar->next = locals;
             lvar->name = token->str;
             lvar->len = token->len;
@@ -567,6 +592,9 @@ Node *unary()
         Node *node = calloc(1, sizeof(Node));
         node->kind = ND_ADDR;
         node->rhs = unary();
+        node->type = calloc(1, sizeof(Type));
+        node->type->ty = PTR;
+        node->type->ptr_to = node->rhs->type;
         return node;
     }
 
@@ -575,6 +603,10 @@ Node *unary()
         Node *node = calloc(1, sizeof(Node));
         node->kind = ND_DEREF;
         node->rhs = unary();
+        //node->type = calloc(1, sizeof(Type));
+        //  fprintf(stderr, "point %d\n", node->rhs->type->ty);
+        node->type = node->rhs->type->ptr_to;
+
         return node;
     }
     return term();
@@ -596,6 +628,8 @@ Node *term()
             Node *node = calloc(1, sizeof(Node));
             node->args = calloc(1, sizeof(Arg));
             node->kind = ND_CALL;
+            node->type = calloc(1, sizeof(Type));
+            node->type->ty = INT;
             node->funcname = tok->str;
             node->funcnamelen = tok->len;
             Arg *curarg = node->args;
@@ -624,11 +658,12 @@ Node *term()
         {
             Node *node = calloc(1, sizeof(Node));
             node->kind = ND_LVAR;
-
             LVar *lvar = find_lvar(tok);
             if (lvar)
             {
                 node->offset = lvar->offset;
+                //fprintf(stderr, "%p\n", lvar->type);
+                node->type = lvar->type;
             }
             else
             {
