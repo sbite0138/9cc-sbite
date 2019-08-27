@@ -40,8 +40,8 @@ void gen(Node *node)
         for (int i = 0; i < node->argnum; i++)
         {
             printf("  mov rax,  rbp\n");
-            printf("  sub rax,  %d\n", 8 + i * 8); //char型に対応はできてない…
-            printf("  mov [rax],  %s\n", arg_reg[i]);
+            printf("  sub rax,  %d\n", 8 + i * 4); //char型に対応はできてない…
+            printf("  mov DWORD[rax],  %s\n", arg_reg[i]);
         }
         gen(node->rhs);
         printf("  mov rsp,rbp\n");
@@ -59,13 +59,27 @@ void gen(Node *node)
         //printf("#ND DEREF\n");
         gen(node->rhs);
         printf("  pop rax\n");
-        printf("  mov rax, [rax]\n");
+        if (node->rhs->type->ptr_to->ty == INT)
+        {
+            printf("  mov eax, DWORD [rax]\n");
+        }
+        else
+        {
+            printf("  mov rax, [rax]\n");
+        }
         printf("  push rax\n");
         return;
     case ND_LVAR:
         gen_lval(node);
         printf("  pop rax\n");
-        printf("  mov rax,[rax]\n");
+        if (node->type->ty == INT)
+        {
+            printf("  mov eax, DWORD [rax]\n");
+        }
+        else
+        {
+            printf("  mov rax,[rax]\n");
+        }
         printf("  push rax\n");
         return;
     case ND_ASSIGN:
@@ -74,7 +88,14 @@ void gen(Node *node)
         gen(node->rhs);
         printf("  pop rdi\n");
         printf("  pop rax\n");
-        printf("  mov [rax], rdi\n");
+        if (node->rhs->type->ty == INT)
+        {
+            printf("  mov DWORD[rax], edi\n");
+        }
+        else
+        {
+            printf("  mov [rax], rdi\n");
+        }
         printf("  push rdi\n");
         return;
     case ND_CALL:
@@ -85,7 +106,7 @@ void gen(Node *node)
 
             printf("  pop rax\n");
 
-            printf("  mov %s, rax\n", arg_reg[i]);
+            printf("  mov %s, eax\n", arg_reg[i]);
 
             node_args = node_args->next;
             //fprintf(stderr, "hoge");
@@ -211,6 +232,7 @@ void gen(Node *node)
     {
 
     case ND_ADD:
+
         printf("  add rax, rdi\n");
         break;
     case ND_SUB:

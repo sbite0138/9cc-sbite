@@ -252,7 +252,7 @@ void program()
     {
 
         locals = calloc(1, sizeof(LVar));
-        locals->offset = 0;
+        locals->offset = 4;
         code[i] = func();
         func_variables[i] = locals;
         i += 1;
@@ -277,7 +277,14 @@ void decl()
     lvar->next = locals;
     lvar->name = token->str;
     lvar->len = token->len;
-    lvar->offset = locals->offset + 8;
+    if (lvar->type->ty == INT)
+    {
+        lvar->offset = locals->offset + 4;
+    }
+    else
+    {
+        lvar->offset = locals->offset + 8;
+    }
     //node->offset = lvar->offset;
     locals = lvar;
     next_token();
@@ -306,7 +313,7 @@ Node *func()
             lvar->next = locals;
             lvar->name = token->str;
             lvar->len = token->len;
-            lvar->offset = locals->offset + 8;
+            lvar->offset = locals->offset + 4;
             locals = lvar;
             node->argnum += 1;
             next_token();

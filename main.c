@@ -12,13 +12,15 @@ int main(int argc, char *argv[])
     //locals->offset = 0;
     token = tokenize(argv[1]);
     //fprintf(stderr, "tokenize() done\n");
+
+    //すべて32bit整数のレジスタ!
     arg_reg = (char **)calloc(6, 16 * sizeof(char));
-    arg_reg[0] = "rdi";
-    arg_reg[1] = "rsi";
-    arg_reg[2] = "rdx";
-    arg_reg[3] = "rcx";
-    arg_reg[4] = "r8";
-    arg_reg[5] = "r9";
+    arg_reg[0] = "edi";
+    arg_reg[1] = "esi";
+    arg_reg[2] = "edx";
+    arg_reg[3] = "ecx";
+    arg_reg[4] = "e8";
+    arg_reg[5] = "e9";
 
     program();
     //fprintf(stderr, "program() done\n");
