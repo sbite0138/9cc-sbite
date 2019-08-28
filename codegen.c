@@ -1,6 +1,36 @@
 #include "9cc.h"
 int label;
-char **arg_reg;
+char **arg_reg_32;
+char **arg_reg_64;
+
+int type_size(Type *type)
+{
+    if (type->ty == INT)
+    {
+        return 4;
+    }
+    if (type->ty == PTR)
+    {
+        return 8;
+    }
+    error("不明なタイプです:%d", type->ty);
+}
+
+void gen_ptr(Node *node)
+{
+    //l rax ,r rdi
+    assert(node->type->ty == PTR);
+    if (node->lhs->type == INT)
+    {
+        assert(node->rhs->type->ty == PTR);
+        printf("  imul rax,%d\n", type_size(node->lhs->type));
+    }
+    else
+    {
+        assert(node->lhs->type->ty == PTR);
+        printf("  imul rdi,%d\n", type_size(node->rhs->type));
+    }
+}
 
 void gen_lval(Node *node)
 {
@@ -41,7 +71,8 @@ void gen(Node *node)
         {
             printf("  mov rax,  rbp\n");
             printf("  sub rax,  %d\n", 8 + i * 4); //char型に対応はできてない…
-            printf("  mov DWORD[rax],  %s\n", arg_reg[i]);
+
+            printf("  mov DWORD PTR[rax],  %s\n", arg_reg_32[i]);
         }
         gen(node->rhs);
         printf("  mov rsp,rbp\n");
@@ -61,7 +92,7 @@ void gen(Node *node)
         printf("  pop rax\n");
         if (node->rhs->type->ptr_to->ty == INT)
         {
-            printf("  mov eax, DWORD [rax]\n");
+            printf("  mov eax, DWORD  PTR[rax]\n");
         }
         else
         {
@@ -74,7 +105,7 @@ void gen(Node *node)
         printf("  pop rax\n");
         if (node->type->ty == INT)
         {
-            printf("  mov eax, DWORD [rax]\n");
+            printf("  mov eax, DWORD  PTR[rax]\n");
         }
         else
         {
@@ -90,7 +121,7 @@ void gen(Node *node)
         printf("  pop rax\n");
         if (node->rhs->type->ty == INT)
         {
-            printf("  mov DWORD[rax], edi\n");
+            printf("  mov DWORD PTR[rax], edi\n");
         }
         else
         {
@@ -105,8 +136,15 @@ void gen(Node *node)
             gen(node_args->node);
 
             printf("  pop rax\n");
-
-            printf("  mov %s, eax\n", arg_reg[i]);
+            /*if (node_args->node->type->ty == INT)
+            {
+                printf("  mov %s, eax\n", arg_reg_32[i]);
+            }
+            else
+            */
+            {
+                printf("  mov %s, rax\n", arg_reg_64[i]);
+            }
 
             node_args = node_args->next;
             //fprintf(stderr, "hoge");
@@ -232,10 +270,17 @@ void gen(Node *node)
     {
 
     case ND_ADD:
-
+        if (node->type->ty == PTR)
+        {
+            gen_ptr(node);
+        }
         printf("  add rax, rdi\n");
         break;
     case ND_SUB:
+        if (node->type->ty == PTR)
+        {
+            gen_ptr(node);
+        }
         printf("  sub rax, rdi\n");
         break;
     case ND_MUL:

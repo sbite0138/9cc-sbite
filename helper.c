@@ -1,4 +1,22 @@
-#include <stdio.h>
+#include "9cc.h"
+
+int calloc4(int **x, int a, int b, int c, int d)
+{
+    *x = calloc(4, sizeof(int));
+    *(*x + 0) = a;
+    *(*x + 1) = b;
+    *(*x + 2) = c;
+    *(*x + 3) = d;
+    return 0;
+}
+int calloc1(int *x)
+{
+    //*x = calloc(1, sizeof(int));
+    printf("%d\n", *x);
+    *x = 1;
+    printf("%d\n", *x);
+    return 0;
+}
 
 int ret_42()
 {

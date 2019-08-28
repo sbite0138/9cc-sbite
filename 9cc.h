@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <ctype.h>
+#include <assert.h>
 
 typedef enum
 {
@@ -137,5 +138,6 @@ extern Node *code[1024];
 extern LVar *func_variables[256];
 extern LVar *locals;
 extern int label;
-extern char **arg_reg;
+extern char **arg_reg_32;
+extern char **arg_reg_64;
 #endif
