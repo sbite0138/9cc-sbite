@@ -84,4 +84,5 @@ try 42 "int main(){int x; int *y;x=42;y=&x;return *y;}"
 try 42 "int main(){int x;int y;int *z;x=42;y=1111;z=&y+1;return *z;}"
 try 3 "int main(){int x;int *y;y=&x;*y=3;return x;}"
 try 42 "int main(){int x;int *y;int **z;  x=20; y=&x;*y=*y+20; z=&y;y=y; return **z+2;}"
+try 8 "int main(){int *p;calloc4(&p, 1, 2, 4, 8);int *q;q = p + 2;if(*q!=4) return 0; q = p + 3;return *q;}"
 echo OK
