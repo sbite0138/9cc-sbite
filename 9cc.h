@@ -18,6 +18,7 @@ typedef enum
     TK_WHILE,
     TK_RETURN,
     TK_FOR,
+    TK_SIZEOF,
     TK_INT,
     TK_EOF
 } TokenKind;
@@ -131,6 +132,8 @@ Block *new_block(Block *cur);
 Block *next_block(Block *block);
 Arg *new_arg(Arg *cur);
 Arg *next_arg(Arg *cur);
+
+int type_size(Type *type);
 
 extern Token *token;
 extern char *user_input;

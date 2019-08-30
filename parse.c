@@ -208,6 +208,12 @@ Token *tokenize(char *p)
             p += 3;
             continue;
         }
+        else if ((strncmp(p, "sizeof", 6) == 0) && !is_alnum(p[6]))
+        {
+            cur = new_token(TK_SIZEOF, cur, p, 6);
+            p += 6;
+            continue;
+        }
         else if ((strncmp(p, "return", 6) == 0) && !is_alnum(p[6]))
         {
             cur = new_token(TK_RETURN, cur, p, 6);
@@ -615,6 +621,11 @@ Node *unary()
         node->type = node->rhs->type->ptr_to;
 
         return node;
+    }
+    if (consume_tokenkind(TK_SIZEOF))
+    {
+        Node *node = unary();
+        return new_node_num(type_size(node->type));
     }
     return term();
 }
