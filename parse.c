@@ -29,6 +29,14 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
         else
         {
             node->type->ty = PTR;
+            if (lhs->type->ty == INT)
+            {
+                node->type->ptr_to = rhs->type;
+            }
+            else
+            {
+                node->type->ptr_to = lhs->type;
+            }
         }
     }
     return node;
@@ -617,9 +625,7 @@ Node *unary()
         node->kind = ND_DEREF;
         node->rhs = unary();
         //node->type = calloc(1, sizeof(Type));
-        //  fprintf(stderr, "point %d\n", node->rhs->type->ty);
         node->type = node->rhs->type->ptr_to;
-
         return node;
     }
     if (consume_tokenkind(TK_SIZEOF))

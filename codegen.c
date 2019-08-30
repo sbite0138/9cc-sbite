@@ -90,6 +90,7 @@ void gen(Node *node)
         //printf("#ND DEREF\n");
         gen(node->rhs);
         printf("  pop rax\n");
+        //fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
         if (node->rhs->type->ptr_to->ty == INT)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
@@ -156,6 +157,7 @@ void gen(Node *node)
         printf("  push rax\n");
         return;
     case ND_RETURN:
+        //fprintf(stderr, "%d\n", node->lhs->kind == ND_DEREF);
         gen(node->lhs);
         printf("  pop rax\n");
         printf("  mov rsp, rbp\n");

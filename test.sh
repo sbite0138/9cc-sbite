@@ -89,6 +89,6 @@ try 4 "int main(){return sizeof(1);}"
 try 4 "int main(){int x; return sizeof(x);}"
 try 8 "int main(){int *x; return sizeof(x);}"
 try 4 "int main(){int *x; return sizeof(sizeof(x));}"
-
-
+try 2 "int main(){int *x; calloc4(&x,1,2,3,4);return  *(x+1);}"
+try 2 "int main(){int *x; calloc4(&x,1,2,3,4);return  *(x+sizeof(x)/8);}"
 echo OK
