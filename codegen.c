@@ -70,7 +70,7 @@ void gen(Node *node)
         for (int i = 0; i < node->argnum; i++)
         {
             printf("  mov rax,  rbp\n");
-            printf("  sub rax,  %d\n", 8 + i * 4); //char型に対応はできてない…
+            printf("  sub rax,  %d\n", 8 + (i + 1) * 4); //char型に対応はできてない…
 
             printf("  mov DWORD PTR[rax],  %s\n", arg_reg_32[i]);
         }

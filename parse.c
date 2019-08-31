@@ -3,7 +3,6 @@ Token *token;
 char *user_input;
 Node *code[1024];
 LVar *func_variables[256];
-
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
     Node *node = calloc(1, sizeof(Node));
@@ -187,7 +186,7 @@ Token *tokenize(char *p)
             p += 2;
             continue;
         }
-        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',' || *p == '&')
+        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',' || *p == '&' || *p == '[' || *p == ']')
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
@@ -266,7 +265,7 @@ void program()
     {
 
         locals = calloc(1, sizeof(LVar));
-        locals->offset = 4;
+        locals->offset = 8;
         code[i] = func();
         func_variables[i] = locals;
         i += 1;
@@ -291,17 +290,25 @@ void decl()
     lvar->next = locals;
     lvar->name = token->str;
     lvar->len = token->len;
+    next_token();
+    int size = 1;
+
+    if (consume("["))
+    {
+        int size = token->val;
+        next_token();
+        expect("]");
+    }
     if (lvar->type->ty == INT)
     {
-        lvar->offset = locals->offset + 4;
+        lvar->offset = locals->offset + 4 * size;
     }
     else
     {
-        lvar->offset = locals->offset + 8;
+        lvar->offset = locals->offset + 8 * size;
     }
     //node->offset = lvar->offset;
     locals = lvar;
-    next_token();
     expect(";");
 }
 
