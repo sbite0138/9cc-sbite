@@ -20,15 +20,18 @@ void gen_ptr(Node *node)
 {
     //l rax ,r rdi
     assert(node->type->ty == PTR);
+    //print_type(node->lhs->type);
+    //print_type(node->rhs->type);
     if (node->lhs->type == INT)
     {
         assert(node->rhs->type->ty == PTR);
-        printf("  imul rax,%d\n", type_size(node->lhs->type));
+        printf("  imul rax,%d\n", type_size(node->rhs->type->ptr_to));
     }
     else
     {
         assert(node->lhs->type->ty == PTR);
-        printf("  imul rdi,%d\n", type_size(node->rhs->type));
+        printf("  imul rdi,%d\n", type_size(node->lhs->type->ptr_to));
+        //  fprintf(stderr, "%d\n", type_size(node->lhs->type));
     }
 }
 

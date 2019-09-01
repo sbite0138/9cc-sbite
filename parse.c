@@ -5,17 +5,18 @@ Node *code[1024];
 LVar *func_variables[256];
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
+
     Node *node = calloc(1, sizeof(Node));
     node->kind = kind;
     node->lhs = lhs;
     node->rhs = rhs;
     node->type = calloc(1, sizeof(Type));
+    //fprintf(stderr, "%d %d\n", lhs->type->ty, rhs->type->ty);
     //fprintf(stderr, "%s\n", token->str);
     if (node->kind == ND_ADD || node->kind == ND_SUB)
     {
         //  fprintf(stderr, "%d %d\n", lhs->kind, rhs->kind);
-        // fprintf(stderr, "%p %p\n", lhs->type, rhs->type);
-
+        //print_type(node->lhs->type);
         if (lhs->type->ty == PTR && rhs->type->ty == PTR)
         {
             error("ポインタ同士の加算/減算です:%s", token->str);
@@ -30,15 +31,34 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
             node->type->ty = PTR;
             if (lhs->type->ty == INT)
             {
-                node->type->ptr_to = rhs->type;
+                node->type = rhs->type;
             }
             else
             {
-                node->type->ptr_to = lhs->type;
+                node->type = lhs->type;
             }
         }
     }
+
     return node;
+}
+
+void print_type(Type *type)
+{
+    switch (type->ty)
+    {
+    case INT:
+        fprintf(stderr, "INT\n");
+        return;
+    case PTR:
+        fprintf(stderr, "PTR->");
+        print_type(type->ptr_to);
+        return;
+    case ARRAY:
+        fprintf(stderr, "ARRAY->");
+        print_type(type->ptr_to);
+        return;
+    }
 }
 
 Node *new_node_num(int val)
@@ -295,6 +315,11 @@ void decl()
 
     if (consume("["))
     {
+        Type *next = calloc(1, sizeof(Type));
+        next->ty = ARRAY;
+        next->ptr_to = lvar->type;
+        lvar->type = next;
+
         int size = token->val;
         next_token();
         expect("]");
@@ -356,12 +381,9 @@ Node *stmt()
     Node *node;
     if (consume_tokenkind(TK_RETURN))
     {
-        //fprintf(stderr, "%s\n", token->str);
-
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = expr();
-        //fprintf(stderr, "%s\n", token->str);
         expect(";");
         return node;
     }
@@ -692,9 +714,20 @@ Node *term()
             LVar *lvar = find_lvar(tok);
             if (lvar)
             {
-                node->offset = lvar->offset;
-                //fprintf(stderr, "%p\n", lvar->type);
-                node->type = lvar->type;
+
+                if (lvar->type->ty == ARRAY)
+                {
+                    node->offset = lvar->offset;
+                    node->type = calloc(1, sizeof(Type));
+                    node->type->ty = PTR;
+                    node->type->ptr_to = lvar->type->ptr_to;
+                }
+                else
+                {
+                    node->offset = lvar->offset;
+                    //fprintf(stderr, "%p\n", lvar->type);
+                    node->type = lvar->type;
+                }
             }
             else
             {

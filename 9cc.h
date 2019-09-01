@@ -133,6 +133,7 @@ Block *new_block(Block *cur);
 Block *next_block(Block *block);
 Arg *new_arg(Arg *cur);
 Arg *next_arg(Arg *cur);
+void print_type(Type *type);
 
 int type_size(Type *type);
 
