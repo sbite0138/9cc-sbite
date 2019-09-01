@@ -93,5 +93,5 @@ try 2 "int main(){int *x; calloc4(&x,1,2,3,4);return  *(x+1);}"
 try 2 "int main(){int *x; calloc4(&x,1,2,3,4);return  *(x+sizeof(x)/8);}"
 try 34 "int main(){ int a[30]; *(a+1)=2;*a=32;return *(a+1)+*a;}"
 try 42 "int main(){ int *a[30];int x;int y;x=32;y=10; *(a+1)=&x;*a=&y;return **(a+1)+**a;}"
-
+try 3 "int main(){int a[2];*a = 1;*(a + 1) = 2;int *p;p = a;return *p + *(p + 1) ;}"
 echo OK
