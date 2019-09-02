@@ -717,10 +717,28 @@ Node *term()
 
                 if (lvar->type->ty == ARRAY)
                 {
-                    node->offset = lvar->offset;
-                    node->type = calloc(1, sizeof(Type));
-                    node->type->ty = PTR;
-                    node->type->ptr_to = lvar->type->ptr_to;
+                    if (consume("["))
+                    {
+                        node->kind = ND_DEREF;
+                        Node *node_lvar = calloc(1, sizeof(Node));
+                        node_lvar->kind = ND_LVAR;
+                        node_lvar->offset = lvar->offset;
+                        node_lvar->type = calloc(1, sizeof(Type));
+                        node_lvar->type->ty = PTR;
+                        node_lvar->type->ptr_to = lvar->type->ptr_to;
+
+                        Node *node_index = unary();
+                        node->rhs = new_node(ND_ADD, node_lvar, node_index);
+                        node->type = node->rhs->type->ptr_to;
+                        expect("]");
+                    }
+                    else
+                    {
+                        node->offset = lvar->offset;
+                        node->type = calloc(1, sizeof(Type));
+                        node->type->ty = PTR;
+                        node->type->ptr_to = lvar->type->ptr_to;
+                    }
                 }
                 else
                 {
