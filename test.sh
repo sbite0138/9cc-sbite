@@ -99,4 +99,6 @@ try 13 "int main(){int a[30];int i; for (i=0;i<30;i=i+1){a[i]=i*i;} return a[3]+
 try 2 "int main(){ int x;int a[30]; *(a+5)=2;return *(a+5);}"
 try 25 "int main(){int a[30];int i; for (i=0;i<30;i=i+1){a[i]=i*i;} return a[ a[2] +a [1] ]; }"
 try 21  "int main(){int *x;int y;x=&y;*x=21; return y;}"
+try 1 "int main(){int *a[3];int *x;int y;x=&y;a[0]=x;*a[0]=1; return y;}"
+try 32 "int main(){int a[30];int *x;x=a;*(x+1)=32;return a[1];}"
 echo OK
