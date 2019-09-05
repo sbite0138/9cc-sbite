@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
     arg_reg_64[5] = "r9";
 
     program();
-    fprintf(stderr, "program() done\n");
+    //fprintf(stderr, "program() done\n");
 
-    bool debug = true;
+    bool debug = false;
     if (debug == true)
     {
         FILE *fp = fopen("ast.dot", "w");
@@ -43,7 +43,6 @@ int main(int argc, char *argv[])
         //return 0;
     }
 
-    fprintf(stderr, "program() done\n");
     printf(".intel_syntax noprefix\n");
     int i = 0;
     for (; code[i]; i++)

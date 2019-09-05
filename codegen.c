@@ -2,7 +2,6 @@
 int label;
 char **arg_reg_32;
 char **arg_reg_64;
-int deref_nest = 0;
 int type_size(Type *type)
 {
     if (type->ty == INT)
@@ -39,9 +38,7 @@ void gen_lval(Node *node)
 {
     if (node->kind == ND_DEREF)
     {
-        deref_nest++;
         gen(node->rhs);
-        deref_nest--;
 
         return;
     }
@@ -110,7 +107,6 @@ void gen(Node *node)
     case ND_LVAR:
         gen_lval(node);
         printf("  pop rax\n");
-        fprintf(stderr, "on_rhs:%d\n", deref_nest);
         if (node->type->ty == INT)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
@@ -123,9 +119,7 @@ void gen(Node *node)
         printf("  push rax\n");
         return;
     case ND_ASSIGN:
-        fprintf(stderr, "jump gen_lval\n");
         gen_lval(node->lhs);
-        fprintf(stderr, "done gen_lval\n");
         // printf("#GEN LEFT DONE\n");
         gen(node->rhs);
         printf("  pop rdi\n");

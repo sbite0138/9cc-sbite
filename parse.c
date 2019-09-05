@@ -337,7 +337,6 @@ void decl()
         lvar->offset = locals->offset + 8 * size;
     }
     //node->offset = lvar->offset;
-    fprintf(stderr, "%s %d\n", lvar->name, lvar->offset);
     locals = lvar;
     expect(";");
 }
