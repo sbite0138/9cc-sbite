@@ -2,7 +2,7 @@
 int label;
 char **arg_reg_32;
 char **arg_reg_64;
-
+int deref_nest = 0;
 int type_size(Type *type)
 {
     if (type->ty == INT)
@@ -37,16 +37,17 @@ void gen_ptr(Node *node)
 
 void gen_lval(Node *node)
 {
-
     if (node->kind == ND_DEREF)
     {
-        //printf("#DEREF\n");
+        deref_nest++;
         gen(node->rhs);
+        deref_nest--;
+
         return;
     }
     else if (node->kind != ND_LVAR)
     {
-        error("代入の左辺値が変数ではありません%d", node->kind == ND_DEREF);
+        error("代入の左辺値が変数ではありません:%d", node->kind);
     }
     printf("  mov rax,  rbp\n");
     printf("  sub rax,  %d\n", node->offset);
@@ -69,7 +70,7 @@ void gen(Node *node)
         printf("%s:\n", name);
         printf("  push rbp\n");
         printf("  mov rbp, rsp\n");
-        printf("  sub rsp, 208\n");
+        printf("  sub rsp, 20800\n");
         for (int i = 0; i < node->argnum; i++)
         {
             printf("  mov rax,  rbp\n");
@@ -91,7 +92,9 @@ void gen(Node *node)
         return;
     case ND_DEREF:
         //printf("#ND DEREF\n");
+        //deref_nest++;
         gen(node->rhs);
+        //deref_nest--;
         printf("  pop rax\n");
         //fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
         if (node->rhs->type->ptr_to->ty == INT)
@@ -107,18 +110,22 @@ void gen(Node *node)
     case ND_LVAR:
         gen_lval(node);
         printf("  pop rax\n");
+        fprintf(stderr, "on_rhs:%d\n", deref_nest);
         if (node->type->ty == INT)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
         }
-        else
+        else if (node->type->ty == PTR)
         {
+            printf("  #ON\n");
             printf("  mov rax,[rax]\n");
         }
         printf("  push rax\n");
         return;
     case ND_ASSIGN:
+        fprintf(stderr, "jump gen_lval\n");
         gen_lval(node->lhs);
+        fprintf(stderr, "done gen_lval\n");
         // printf("#GEN LEFT DONE\n");
         gen(node->rhs);
         printf("  pop rdi\n");

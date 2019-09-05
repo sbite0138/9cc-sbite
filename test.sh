@@ -96,5 +96,7 @@ try 42 "int main(){ int *a[30];int x;int y;x=32;y=10; *(a+1)=&x;*a=&y;return **(
 try 3 "int main(){int a[2];*a = 1;*(a + 1) = 2;int *p;p = a;return *p + *(p + 1) ;}"
 try 34 "int main(){int a[30];a[3]=2;a[0]=32; return a[3]+a[0];}"
 try 13 "int main(){int a[30];int i; for (i=0;i<30;i=i+1){a[i]=i*i;} return a[3]+a[2]; }"
-
+try 2 "int main(){ int x;int a[30]; *(a+5)=2;return *(a+5);}"
+try 25 "int main(){int a[30];int i; for (i=0;i<30;i=i+1){a[i]=i*i;} return a[ a[2] +a [1] ]; }"
+try 21  "int main(){int *x;int y;x=&y;*x=21; return y;}"
 echo OK

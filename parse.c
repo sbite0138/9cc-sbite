@@ -26,6 +26,10 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 
             node->type->ty = INT;
         } //char入れたらこの後にも追加する
+        else if ((lhs->type->ty == ARRAY && rhs->type->ty == INT) || (lhs->type->ty == INT && rhs->type->ty == ARRAY))
+        {
+            node->type->ty = ARRAY;
+        }
         else
         {
             node->type->ty = PTR;
@@ -320,7 +324,7 @@ void decl()
         next->ptr_to = lvar->type;
         lvar->type = next;
 
-        int size = token->val;
+        size = token->val;
         next_token();
         expect("]");
     }
@@ -333,6 +337,7 @@ void decl()
         lvar->offset = locals->offset + 8 * size;
     }
     //node->offset = lvar->offset;
+    fprintf(stderr, "%s %d\n", lvar->name, lvar->offset);
     locals = lvar;
     expect(";");
 }
@@ -720,6 +725,7 @@ Node *term()
                     if (consume("["))
                     {
                         node->kind = ND_DEREF;
+
                         Node *node_lvar = calloc(1, sizeof(Node));
                         node_lvar->kind = ND_LVAR;
                         node_lvar->offset = lvar->offset;
@@ -727,14 +733,27 @@ Node *term()
                         node_lvar->type->ty = PTR;
                         node_lvar->type->ptr_to = lvar->type->ptr_to;
 
-                        Node *node_index = unary();
-                        node->rhs = new_node(ND_ADD, node_lvar, node_index);
+                        Node *node_addr = calloc(1, sizeof(Node));
+                        node_addr->kind = ND_ADDR;
+                        node_addr->rhs = node_lvar;
+                        node_addr->type = calloc(1, sizeof(Type));
+                        node_addr->type->ty = PTR;
+                        node_addr->type->ptr_to = node_lvar->type->ptr_to;
+
+                        Node *node_index = add();
+                        node->rhs = new_node(ND_ADD, node_addr, node_index);
                         node->type = node->rhs->type->ptr_to;
                         expect("]");
                     }
                     else
                     {
-                        node->offset = lvar->offset;
+                        node->kind = ND_ADDR;
+                        Node *node_lvar = calloc(1, sizeof(Node));
+                        node_lvar->kind = ND_LVAR;
+                        node_lvar->offset = lvar->offset;
+                        node_lvar->type = lvar->type;
+
+                        node->rhs = node_lvar;
                         node->type = calloc(1, sizeof(Type));
                         node->type->ty = PTR;
                         node->type->ptr_to = lvar->type->ptr_to;
@@ -743,7 +762,6 @@ Node *term()
                 else
                 {
                     node->offset = lvar->offset;
-                    //fprintf(stderr, "%p\n", lvar->type);
                     node->type = lvar->type;
                 }
             }

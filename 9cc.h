@@ -137,6 +137,8 @@ void print_type(Type *type);
 
 int type_size(Type *type);
 
+void node_name(NodeKind kind, char *s);
+void dumpAST(FILE *fp, Node *node);
 extern Token *token;
 extern char *user_input;
 extern Node *code[1024];
