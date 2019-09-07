@@ -285,24 +285,32 @@ void program()
 {
 
     int i = 0;
+    globals = NULL;
     while (!at_eof())
     {
 
         locals = calloc(1, sizeof(LVar));
         locals->offset = 8;
-        code[i] = func();
-        func_variables[i] = locals;
-        i += 1;
+        code[i] = toplevel();
+        //トップレベルには関数かグローバル変数の定義が入る。
+        //グローバル変数の場合、戻り値はNULLになる（宣言は新しいnodeを生成しないので）
+        //返った結果がNULLかどうかで処理を分けている
+        if (code[i] != NULL)
+        {
+            func_variables[i] = locals;
+            i += 1;
+        }
     }
 
     code[i] = NULL;
 }
-
-void decl()
+Type *decl_type()
 {
-    LVar *lvar = calloc(1, sizeof(LVar));
-    lvar->type = calloc(1, sizeof(Type));
-    Type *cur = lvar->type;
+    //int型でいいのか…？
+    int base_type = token->kind;
+    next_token();
+    Type *type = calloc(1, sizeof(Type));
+    Type *cur = type;
     while (consume("*"))
     {
         cur->ty = PTR;
@@ -310,7 +318,19 @@ void decl()
         cur->ptr_to = next;
         cur = next;
     }
-    cur->ty = INT;
+    switch (base_type)
+    {
+    case TK_INT:
+        cur->ty = INT;
+        break;
+    }
+    return type;
+}
+
+void decl_lvar()
+{
+    LVar *lvar = calloc(1, sizeof(LVar));
+    lvar->type = decl_type();
     lvar->next = locals;
     lvar->name = token->str;
     lvar->len = token->len;
@@ -330,6 +350,7 @@ void decl()
     }
     if (lvar->type->ty == INT)
     {
+
         lvar->offset = locals->offset + 4 * size;
     }
     else
@@ -337,46 +358,84 @@ void decl()
         lvar->offset = locals->offset + 8 * size;
     }
     //node->offset = lvar->offset;
+
     locals = lvar;
     expect(";");
 }
 
-Node *func()
+Node *toplevel()
 {
-    consume_tokenkind(TK_INT);
-    Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_FUNC;
-    node->funcname = token->str;
-    node->funcnamelen = token->len;
-    node->argnum = 0;
-    Node *cur = node;
-    next_token();
-    expect("(");
-    if (!consume(")"))
-    {
-        for (;;)
-        {
-            consume_tokenkind(TK_INT);
-            LVar *lvar = calloc(1, sizeof(LVar));
-            lvar->type = calloc(1, sizeof(Type));
-            lvar->type->ty = INT;
-            lvar->next = locals;
-            lvar->name = token->str;
-            lvar->len = token->len;
-            lvar->offset = locals->offset + 4;
-            locals = lvar;
-            node->argnum += 1;
-            next_token();
+    Type *type = decl_type();
 
-            if (!consume(","))
+    Node *node = calloc(1, sizeof(Node));
+    char *name = token->str;
+    int len = token->len;
+    next_token();
+
+    if (consume("("))
+    {
+
+        node->kind = ND_FUNC;
+        node->funcname = name;
+        node->funcnamelen = len;
+        node->argnum = 0;
+        Node *cur = node;
+        if (!consume(")"))
+        {
+            for (;;)
             {
-                break;
+                LVar *lvar = calloc(1, sizeof(LVar));
+                lvar->type = decl_type();
+                lvar->next = locals;
+                lvar->name = token->str;
+                lvar->len = token->len;
+                lvar->offset = locals->offset + 4;
+                locals = lvar;
+                node->argnum += 1;
+                next_token();
+
+                if (!consume(","))
+                {
+                    break;
+                }
             }
+            expect(")");
         }
-        expect(")");
+        node->rhs = stmt();
+        return node;
     }
-    node->rhs = stmt();
-    return node;
+    else
+    {
+        LVar *lvar = calloc(1, sizeof(LVar));
+        lvar->type = type;
+        lvar->next = globals;
+        lvar->name = name;
+        lvar->len = len;
+        int size = 1;
+        if (consume("["))
+        {
+            Type *next = calloc(1, sizeof(Type));
+            next->ty = ARRAY;
+            next->ptr_to = lvar->type;
+            lvar->type = next;
+
+            size = token->val;
+            next_token();
+            expect("]");
+        }
+        if (lvar->type->ty == INT)
+        {
+
+            lvar->size = 4 * size;
+        }
+        else
+        {
+            lvar->size = 8 * size;
+        }
+        globals = lvar;
+        expect(";");
+        return NULL;
+    }
 }
 
 Node *stmt()
@@ -472,9 +531,9 @@ Node *stmt()
     {
 
         /*
-        BLOCK*=
-            "{" (declval* stmt declval*)* "}" |
-            "{" (declval*) "}"
+        BLOCK=
+            "{" (declvar* stmt declvar*)* "}" |
+            "{" (declvar*) "}"
         という構文になる
         */
         node = calloc(1, sizeof(Node));
@@ -482,23 +541,23 @@ Node *stmt()
         node->block = calloc(1, sizeof(Block));
 
         Block *current_block = node->block;
-        while (consume_tokenkind(TK_INT))
+        while (token->kind == TK_INT)
         {
-            decl();
+            decl_lvar();
         }
         if (!(consume("}")))
         {
             for (;;)
             {
-                while (consume_tokenkind(TK_INT))
+                while (token->kind == TK_INT)
                 {
-                    decl();
+                    decl_lvar();
                 }
                 current_block->stmt_node = stmt();
 
-                while (consume_tokenkind(TK_INT))
+                while (token->kind == TK_INT)
                 {
-                    decl();
+                    decl_lvar();
                 }
 
                 if (consume("}"))
@@ -715,7 +774,12 @@ Node *term()
         {
             Node *node = calloc(1, sizeof(Node));
             node->kind = ND_LVAR;
-            LVar *lvar = find_lvar(tok);
+            LVar *lvar = find_lvar(tok, locals);
+            if (lvar == NULL)
+            {
+                node->kind = ND_GVAR;
+                lvar = find_lvar(tok, globals);
+            }
             if (lvar)
             {
 

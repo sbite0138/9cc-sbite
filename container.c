@@ -1,9 +1,11 @@
 #include "9cc.h"
 
 LVar *locals;
-LVar *find_lvar(Token *tok)
+LVar *globals;
+
+LVar *find_lvar(Token *tok, LVar *root)
 {
-    LVar *var = locals;
+    LVar *var = root;
     for (; var != NULL; var = var->next)
     {
         if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))

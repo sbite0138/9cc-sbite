@@ -15,6 +15,18 @@ int type_size(Type *type)
     error("不明なタイプです:%d", type->ty);
 }
 
+void gen_globals()
+{
+    LVar *var = globals;
+    fprintf(stderr, "%s\n", var->name);
+    char *varname = calloc(128, sizeof(char));
+    for (; var != NULL; var = var->next)
+    {
+        strncpy(varname, var->name, var->len);
+        printf(".comm %s, %d\n", varname, var->size);
+    }
+}
+
 void gen_ptr(Node *node)
 {
     //l rax ,r rdi
@@ -42,7 +54,7 @@ void gen_lval(Node *node)
 
         return;
     }
-    else if (node->kind != ND_LVAR)
+    else if (node->kind != ND_LVAR && node->kind != ND_GVAR)
     {
         error("代入の左辺値が変数ではありません:%d", node->kind);
     }

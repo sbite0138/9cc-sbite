@@ -51,13 +51,14 @@ typedef enum
     ND_DEREF,
     ND_LVAR,
     ND_FUNC,
+    ND_GVAR,
     ND_CALL,
     ND_IF,
     ND_IFELSE,
     ND_WHILE,
     ND_FOR,
     ND_BLOCK,
-    ND_RETURN
+    ND_RETURN,
 } NodeKind;
 
 typedef struct Node Node;
@@ -102,8 +103,10 @@ struct LVar
     char *name;
     int len;
     int offset;
+    int size;
     Type *type;
 };
+
 struct Arg
 {
     Node *node;
@@ -113,7 +116,7 @@ struct Arg
 void error(char *fmt, ...);
 
 void program();
-Node *func();
+Node *toplevel();
 Node *stmt();
 Node *expr();
 Node *assign();
@@ -128,7 +131,9 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
 Token *tokenize(char *p);
 Node *expr();
 
-LVar *find_lvar(Token *tok);
+void gen_globals();
+
+LVar *find_lvar(Token *tok, LVar *root);
 Block *new_block(Block *cur);
 Block *next_block(Block *block);
 Arg *new_arg(Arg *cur);
@@ -144,6 +149,7 @@ extern char *user_input;
 extern Node *code[1024];
 extern LVar *func_variables[256];
 extern LVar *locals;
+extern LVar *globals;
 extern int label;
 extern char **arg_reg_32;
 extern char **arg_reg_64;

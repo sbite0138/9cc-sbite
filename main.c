@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     arg_reg_64[5] = "r9";
 
     program();
-    //fprintf(stderr, "program() done\n");
+    fprintf(stderr, "program() done\n");
 
     bool debug = false;
     if (debug == true)
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         fclose(fp);
         //return 0;
     }
-
+    gen_globals();
     printf(".intel_syntax noprefix\n");
     int i = 0;
     for (; code[i]; i++)
