@@ -113,4 +113,7 @@ try 13 "int i;int main(){int a[30]; for (i=0;i<30;i=i+1){a[i]=i*i;} return a[3]+
 try 42 "int x; int main(){foo(); bar();return x;} int foo(){x=42; return 0;} int bar(){int x;x=32;return 0;}"
 try 32 "int *a[3]; int x;int main(){ a[1]=&x;*a[1]=32; return x;}"
 try 32 "int *a[3]; int x;int main(){ *(a+1)=&x;**(a+1)=32; return x;}"
+try 3 "int main(){char x[3];x[0] = -1;x[1] = 2;int y;y = 4;return x[0] + y;}"
+try 32 "char *c;int main(){char d;c=&d;*c=32;return d;}"
+try 32 "char c[12];int main(){char d;*c=32;return *c;}"
 echo OK

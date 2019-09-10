@@ -20,6 +20,7 @@ typedef enum
     TK_FOR,
     TK_SIZEOF,
     TK_INT,
+    TK_CHAR,
     TK_EOF
 } TokenKind;
 
@@ -71,6 +72,7 @@ struct Type
     enum
     {
         INT,
+        CHAR,
         PTR,
         ARRAY
     } ty;

@@ -21,18 +21,31 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
         {
             error("ポインタ同士の加算/減算です:%s", token->str);
         }
+        // int+int=int
         if (lhs->type->ty == INT && rhs->type->ty == INT)
         {
 
             node->type->ty = INT;
-        } //char入れたらこの後にも追加する
+        }
+        // char+char=int (ほんとうです https://wandbox.org/permlink/PtkWNhW6gY0Qz3RB)
+        if (lhs->type->ty == CHAR && rhs->type->ty == CHAR)
+        {
+
+            node->type->ty = INT;
+        }
+        // array+int=array
         else if ((lhs->type->ty == ARRAY && rhs->type->ty == INT) || (lhs->type->ty == INT && rhs->type->ty == ARRAY))
+        {
+            node->type->ty = ARRAY;
+        }
+        // array+char=array (あるのか？)
+        else if ((lhs->type->ty == ARRAY && rhs->type->ty == CHAR) || (lhs->type->ty == CHAR && rhs->type->ty == ARRAY))
         {
             node->type->ty = ARRAY;
         }
         else
         {
-            node->type->ty = PTR;
+            // PTR+INTみたいな式のこと…？
             if (lhs->type->ty == INT)
             {
                 node->type = rhs->type;
@@ -41,6 +54,7 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
             {
                 node->type = lhs->type;
             }
+            //  fprintf(stderr, "%d\n", node->type->ty == PTR);
         }
     }
 
@@ -53,6 +67,9 @@ void print_type(Type *type)
     {
     case INT:
         fprintf(stderr, "INT\n");
+        return;
+    case CHAR:
+        fprintf(stderr, "CHAR\n");
         return;
     case PTR:
         fprintf(stderr, "PTR->");
@@ -257,6 +274,12 @@ Token *tokenize(char *p)
             p += 3;
             continue;
         }
+        else if ((strncmp(p, "char", 4) == 0) && !is_alnum(p[4]))
+        {
+            cur = new_token(TK_CHAR, cur, p, 4);
+            p += 4;
+            continue;
+        }
         else if (isalpha(*p))
         {
             int len = 0;
@@ -322,6 +345,9 @@ Type *decl_type()
     {
     case TK_INT:
         cur->ty = INT;
+        break;
+    case TK_CHAR:
+        cur->ty = CHAR;
         break;
     }
     return type;
@@ -541,7 +567,7 @@ Node *stmt()
         node->block = calloc(1, sizeof(Block));
 
         Block *current_block = node->block;
-        while (token->kind == TK_INT)
+        while (token->kind == TK_INT || token->kind == TK_CHAR)
         {
             decl_lvar();
         }
@@ -549,13 +575,13 @@ Node *stmt()
         {
             for (;;)
             {
-                while (token->kind == TK_INT)
+                while (token->kind == TK_INT || token->kind == TK_CHAR)
                 {
                     decl_lvar();
                 }
                 current_block->stmt_node = stmt();
 
-                while (token->kind == TK_INT)
+                while (token->kind == TK_INT || token->kind == TK_CHAR)
                 {
                     decl_lvar();
                 }

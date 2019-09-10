@@ -4,6 +4,10 @@ char **arg_reg_32;
 char **arg_reg_64;
 int type_size(Type *type)
 {
+    if (type->ty == CHAR)
+    {
+        return 1;
+    }
     if (type->ty == INT)
     {
         return 4;
@@ -34,6 +38,7 @@ void gen_ptr(Node *node)
     assert(node->type->ty == PTR);
     //print_type(node->lhs->type);
     //print_type(node->rhs->type);
+    //これはINT+PTRみたいな部分のアセンブルになっていて（多分）、CHARはここに入らないという前提をおきます（おくので）（PTR+CHARはgccでも警告が出ます）
     if (node->lhs->type == INT)
     {
         assert(node->rhs->type->ty == PTR);
@@ -129,6 +134,7 @@ void gen(Node *node)
         //deref_nest--;
         printf("  pop rax\n");
         //fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
+        //多分ここは*(a+INT)みたいな処理をアセンブルしていて、*(a+CHAR)みたいなのはgccでもWarnが出るので考えないことにします
         if (node->rhs->type->ptr_to->ty == INT)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
@@ -146,6 +152,10 @@ void gen(Node *node)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
         }
+        else if (node->type->ty == CHAR)
+        {
+            printf("  movsx eax, BYTE  PTR[rax]\n");
+        }
         else if (node->type->ty == PTR)
         {
             printf("  #ON\n");
@@ -160,6 +170,11 @@ void gen(Node *node)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
         }
+        else if (node->type->ty == CHAR)
+        {
+            printf("  movsx eax, BYTE  PTR[rax]\n");
+        }
+
         else if (node->type->ty == PTR)
         {
             printf("  #ON\n");
@@ -168,6 +183,8 @@ void gen(Node *node)
         printf("  push rax\n");
         return;
     case ND_ASSIGN:
+        //print_type(node->lhs->type);
+
         if (node->lhs->kind == ND_LVAR)
         {
             gen_lval(node->lhs);
@@ -181,9 +198,14 @@ void gen(Node *node)
         gen(node->rhs);
         printf("  pop rdi\n");
         printf("  pop rax\n");
-        if (node->rhs->type->ty == INT)
+
+        if (node->lhs->type->ty == INT)
         {
             printf("  mov DWORD PTR[rax], edi\n");
+        }
+        else if (node->lhs->type->ty == CHAR)
+        {
+            printf("  mov [rax], dil\n");
         }
         else
         {
