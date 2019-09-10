@@ -4,7 +4,7 @@ try() {
   input="$2"
 
   ./9cc "$input" > tmp.s
-  gcc -o tmp tmp.s helper.o
+  gcc -static -o tmp tmp.s helper.o
   ./tmp
   actual="$?"
 
@@ -116,4 +116,6 @@ try 32 "int *a[3]; int x;int main(){ *(a+1)=&x;**(a+1)=32; return x;}"
 try 3 "int main(){char x[3];x[0] = -1;x[1] = 2;int y;y = 4;return x[0] + y;}"
 try 32 "char *c;int main(){char d;c=&d;*c=32;return d;}"
 try 32 "char c[12];int main(){char d;*c=32;return *c;}"
+try 97 'int main(){char *s;s="cat";return *(s+1);}'
+
 echo OK

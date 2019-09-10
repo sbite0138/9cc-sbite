@@ -32,6 +32,20 @@ void gen_globals()
     }
 }
 
+void gen_strings()
+{
+    Str *cur = strings;
+    if (cur == NULL)
+        return;
+    char *str = calloc(128, sizeof(char));
+    for (; cur != NULL; cur = cur->next)
+    {
+        strncpy(str, cur->str, cur->len);
+        printf(".LC%d:\n", cur->id);
+        printf("  .string %s\n", str);
+    }
+}
+
 void gen_ptr(Node *node)
 {
     //l rax ,r rdi
@@ -180,6 +194,10 @@ void gen(Node *node)
             printf("  #ON\n");
             printf("  mov rax,[rax]\n");
         }
+        printf("  push rax\n");
+        return;
+    case ND_STR:
+        printf("  mov rax, OFFSET FLAT:.LC%d\n", node->str->id);
         printf("  push rax\n");
         return;
     case ND_ASSIGN:

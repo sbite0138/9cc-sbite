@@ -20,6 +20,7 @@ typedef enum
     TK_FOR,
     TK_SIZEOF,
     TK_INT,
+    TK_STR,
     TK_CHAR,
     TK_EOF
 } TokenKind;
@@ -53,6 +54,7 @@ typedef enum
     ND_LVAR,
     ND_FUNC,
     ND_GVAR,
+    ND_STR,
     ND_CALL,
     ND_IF,
     ND_IFELSE,
@@ -65,6 +67,7 @@ typedef enum
 typedef struct Node Node;
 typedef struct Block Block;
 typedef struct LVar LVar;
+typedef struct Str Str;
 typedef struct Arg Arg;
 typedef struct Type Type;
 struct Type
@@ -94,6 +97,7 @@ struct Node
     Arg *args;       //kindがND_CALLの場合のみ使う
     int argnum;      //kindがND_FUNCの場合のみ使う
     Type *type;      //kindがND_ADDまたはND_SUBのとき、その演算が何に対して行われるのか表す
+    Str *str;        //kindがND_STRの場合のみ使う
 };
 struct Block
 {
@@ -109,6 +113,14 @@ struct LVar
     int offset;
     int size;
     Type *type;
+};
+
+struct Str
+{
+    Str *next;
+    char *str;
+    int len;
+    int id;
 };
 
 struct Arg
@@ -136,6 +148,7 @@ Token *tokenize(char *p);
 Node *expr();
 
 void gen_globals();
+void gen_strings();
 void gen_gval(Node *node);
 
 LVar *find_lvar(Token *tok, LVar *root);
@@ -155,6 +168,8 @@ extern Node *code[1024];
 extern LVar *func_variables[256];
 extern LVar *locals;
 extern LVar *globals;
+extern Str *strings;
+
 extern int label;
 extern char **arg_reg_32;
 extern char **arg_reg_64;

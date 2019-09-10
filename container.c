@@ -2,6 +2,7 @@
 
 LVar *locals;
 LVar *globals;
+Str *strings;
 
 LVar *find_lvar(Token *tok, LVar *root)
 {
@@ -38,4 +39,17 @@ Arg *new_arg(Arg *cur)
 Arg *next_arg(Arg *cur)
 {
     return cur->next;
+}
+
+Str *find_str(char *s, int len)
+{
+    Str *cur = strings;
+    for (; cur != NULL; cur = cur->next)
+    {
+        if (strncmp(cur->str, s, len) == 0)
+        {
+            return cur;
+        }
+    }
+    return NULL;
 }

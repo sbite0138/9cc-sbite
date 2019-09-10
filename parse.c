@@ -232,6 +232,7 @@ Token *tokenize(char *p)
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
         }
+
         else if ((strncmp(p, "if", 2) == 0) && !is_alnum(p[2]))
         {
             cur = new_token(TK_IF, cur, p, 2);
@@ -280,6 +281,46 @@ Token *tokenize(char *p)
             p += 4;
             continue;
         }
+        else if (*p == '\'')
+        {
+            cur = new_token(TK_NUM, cur, p, -1);
+            p++;
+            char c = *p;
+            if (c != '\\')
+            {
+                p++;
+            }
+            else
+            {
+                p++;
+                c = *p;
+                if (c == 'n')
+                {
+                    c = '\n';
+                }
+                p++;
+            }
+            if (*p != '\'')
+            {
+                error("\'\'の間に複数文字が入っています");
+            }
+            p++;
+            cur->val = (int)c;
+            continue;
+        }
+        else if (*p == '\"')
+        {
+            int len = 1;
+            //fprintf(stderr, "str\n");
+            while (*(p + len) != '\"')
+            {
+                len++;
+            }
+            len++;
+            cur = new_token(TK_STR, cur, p, len);
+            p += len;
+            continue;
+        }
         else if (isalpha(*p))
         {
             int len = 0;
@@ -309,6 +350,7 @@ void program()
 
     int i = 0;
     globals = NULL;
+    strings = NULL;
     while (!at_eof())
     {
 
@@ -878,6 +920,28 @@ Node *term()
             }
             return node;
         }
+    }
+    if (token->kind == TK_STR)
+    {
+        Node *node = calloc(1, sizeof(Node));
+        node->kind = ND_STR;
+        Str *str = calloc(1, sizeof(Str));
+        str->str = token->str;
+        str->len = token->len;
+        if (strings == NULL)
+        {
+            str->id = 0;
+        }
+        else
+        {
+            str->id = strings->id + 1;
+        }
+        str->next = strings;
+        strings = str;
+        node->str = str;
+
+        next_token();
+        return node;
     }
     return new_node_num(expect_number());
 }
