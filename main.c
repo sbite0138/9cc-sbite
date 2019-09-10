@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
     arg_reg_64[5] = "r9";
 
     program();
-    fprintf(stderr, "program() done\n");
+    //fprintf(stderr, "program() done\n");
 
-    bool debug = false;
+    bool debug = true;
     if (debug == true)
     {
         FILE *fp = fopen("ast.dot", "w");

@@ -772,12 +772,15 @@ Node *term()
         }
         else
         {
+            int var_type;
             Node *node = calloc(1, sizeof(Node));
             node->kind = ND_LVAR;
             LVar *lvar = find_lvar(tok, locals);
+            var_type = ND_LVAR;
             if (lvar == NULL)
             {
                 node->kind = ND_GVAR;
+                var_type = ND_GVAR;
                 lvar = find_lvar(tok, globals);
             }
             if (lvar)
@@ -788,13 +791,17 @@ Node *term()
                     if (consume("["))
                     {
                         node->kind = ND_DEREF;
-
                         Node *node_lvar = calloc(1, sizeof(Node));
-                        node_lvar->kind = ND_LVAR;
+                        node_lvar->kind = var_type;
                         node_lvar->offset = lvar->offset;
                         node_lvar->type = calloc(1, sizeof(Type));
                         node_lvar->type->ty = PTR;
                         node_lvar->type->ptr_to = lvar->type->ptr_to;
+                        if (var_type == ND_GVAR)
+                        {
+                            node_lvar->gvarname = lvar->name;
+                            node_lvar->gvarnamelen = lvar->len;
+                        }
 
                         Node *node_addr = calloc(1, sizeof(Node));
                         node_addr->kind = ND_ADDR;
@@ -812,10 +819,14 @@ Node *term()
                     {
                         node->kind = ND_ADDR;
                         Node *node_lvar = calloc(1, sizeof(Node));
-                        node_lvar->kind = ND_LVAR;
+                        node_lvar->kind = var_type;
                         node_lvar->offset = lvar->offset;
                         node_lvar->type = lvar->type;
-
+                        if (var_type == ND_GVAR)
+                        {
+                            node_lvar->gvarname = lvar->name;
+                            node_lvar->gvarnamelen = lvar->len;
+                        }
                         node->rhs = node_lvar;
                         node->type = calloc(1, sizeof(Type));
                         node->type->ty = PTR;
@@ -826,6 +837,11 @@ Node *term()
                 {
                     node->offset = lvar->offset;
                     node->type = lvar->type;
+                    if (var_type == ND_GVAR)
+                    {
+                        node->gvarname = lvar->name;
+                        node->gvarnamelen = lvar->len;
+                    }
                 }
             }
             else

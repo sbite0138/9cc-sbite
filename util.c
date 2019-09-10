@@ -48,6 +48,9 @@ void node_name(NodeKind kind, char *s)
     case ND_LVAR:
         strcpy(s, "LVAR");
         break;
+    case ND_GVAR:
+        strcpy(s, "GVAR");
+        break;
     case ND_MOD:
         strcpy(s, "MOD");
         break;

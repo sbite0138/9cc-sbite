@@ -18,7 +18,8 @@ int type_size(Type *type)
 void gen_globals()
 {
     LVar *var = globals;
-    fprintf(stderr, "%s\n", var->name);
+    if (var == NULL)
+        return;
     char *varname = calloc(128, sizeof(char));
     for (; var != NULL; var = var->next)
     {
@@ -44,6 +45,19 @@ void gen_ptr(Node *node)
         printf("  imul rdi,%d\n", type_size(node->lhs->type->ptr_to));
         //  fprintf(stderr, "%d\n", type_size(node->lhs->type));
     }
+}
+
+void gen_gval(Node *node)
+{
+    if (node->kind == ND_DEREF)
+    {
+        gen(node->rhs);
+        return;
+    }
+    char *varname = calloc(128, sizeof(char));
+    strncpy(varname, node->gvarname, node->gvarnamelen);
+    printf("  lea rax,%s[rip]\n", varname);
+    printf("  push rax\n");
 }
 
 void gen_lval(Node *node)
@@ -97,7 +111,16 @@ void gen(Node *node)
         printf("  push %d\n", node->val);
         return;
     case ND_ADDR:
-        gen_lval(node->rhs);
+        if (node->rhs->kind == ND_LVAR)
+        {
+            //fprintf(stderr, "LVAR\n");
+            gen_lval(node->rhs);
+        }
+        else
+        {
+            //fprintf(stderr, "GVAR\n");
+            gen_gval(node->rhs);
+        }
         return;
     case ND_DEREF:
         //printf("#ND DEREF\n");
@@ -130,8 +153,30 @@ void gen(Node *node)
         }
         printf("  push rax\n");
         return;
+    case ND_GVAR:
+        gen_gval(node);
+        printf("  pop rax\n");
+        if (node->type->ty == INT)
+        {
+            printf("  mov eax, DWORD  PTR[rax]\n");
+        }
+        else if (node->type->ty == PTR)
+        {
+            printf("  #ON\n");
+            printf("  mov rax,[rax]\n");
+        }
+        printf("  push rax\n");
+        return;
     case ND_ASSIGN:
-        gen_lval(node->lhs);
+        if (node->lhs->kind == ND_LVAR)
+        {
+            gen_lval(node->lhs);
+        }
+        else
+        {
+            // node->lhs->kindがND_DEREFの場合はgen_gval内で再びgenに飛ぶ
+            gen_gval(node->lhs);
+        }
         // printf("#GEN LEFT DONE\n");
         gen(node->rhs);
         printf("  pop rdi\n");
@@ -169,6 +214,7 @@ void gen(Node *node)
         //fprintf(stderr, "done\n");
 
         strncpy(name, node->funcname, node->funcnamelen);
+        printf("  mov al, 0\n");
         printf("  call %s\n", name);
         printf("  push rax\n");
         return;

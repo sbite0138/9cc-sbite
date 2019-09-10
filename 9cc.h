@@ -83,8 +83,10 @@ struct Node
     Node *lhs;
     Node *rhs;
     Block *block;
-    int val;         // kindがND_NUMの場合のみ使う
-    int offset;      // kindがND_LVARの場合のみ使う
+    int val;         //kindがND_NUMの場合のみ使う
+    int offset;      //kindがND_LVARの場合のみ使う
+    char *gvarname;  //kindがND_GVALの場合のみ使う
+    int gvarnamelen; //kindがND_GVALの場合のみ使う
     char *funcname;  //kindがND_CALLまたはND_FUNCの場合のみ使う
     int funcnamelen; //kindがND_CALLまたはND_FUNCの場合のみ使う
     Arg *args;       //kindがND_CALLの場合のみ使う
@@ -132,6 +134,7 @@ Token *tokenize(char *p);
 Node *expr();
 
 void gen_globals();
+void gen_gval(Node *node);
 
 LVar *find_lvar(Token *tok, LVar *root);
 Block *new_block(Block *cur);
