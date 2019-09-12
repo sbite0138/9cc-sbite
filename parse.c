@@ -319,6 +319,7 @@ Token *tokenize(char *p)
             len++;
             cur = new_token(TK_STR, cur, p, len);
             p += len;
+            fprintf(stderr, "%s\n", p);
             continue;
         }
         else if (isalpha(*p))
@@ -405,7 +406,7 @@ void decl_lvar()
     next_token();
     int size = 1;
 
-    if (consume("["))
+    while (consume("["))
     {
         Type *next = calloc(1, sizeof(Type));
         next->ty = ARRAY;
@@ -416,6 +417,7 @@ void decl_lvar()
         next_token();
         expect("]");
     }
+
     if (lvar->type->ty == INT)
     {
 

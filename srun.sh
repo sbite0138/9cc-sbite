@@ -1,4 +1,4 @@
 #!/bin/bash
-gcc -static -o tmp tmp.s helper.o
+gcc -static -g -o tmp tmp.s helper.o
 ./tmp
 echo $?

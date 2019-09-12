@@ -40,10 +40,13 @@ void gen_strings()
     char *str = calloc(128, sizeof(char));
     for (; cur != NULL; cur = cur->next)
     {
+        fprintf(stderr, "strings : %s\n", cur->str);
         strncpy(str, cur->str, cur->len);
+        str[cur->len] = '\0';
         printf(".LC%d:\n", cur->id);
         printf("  .string %s\n", str);
     }
+    //exit(0);
 }
 
 void gen_ptr(Node *node)
@@ -84,7 +87,7 @@ void gen_lval(Node *node)
     if (node->kind == ND_DEREF)
     {
         gen(node->rhs);
-
+        printf("#back\n");
         return;
     }
     else if (node->kind != ND_LVAR && node->kind != ND_GVAR)
@@ -149,6 +152,7 @@ void gen(Node *node)
         printf("  pop rax\n");
         //fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
         //多分ここは*(a+INT)みたいな処理をアセンブルしていて、*(a+CHAR)みたいなのはgccでもWarnが出るので考えないことにします
+        printf("#DEREF\n");
         if (node->rhs->type->ptr_to->ty == INT)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
@@ -157,6 +161,8 @@ void gen(Node *node)
         {
             printf("  mov rax, [rax]\n");
         }
+        printf("#DEREF DONE\n");
+
         printf("  push rax\n");
         return;
     case ND_LVAR:
@@ -214,6 +220,9 @@ void gen(Node *node)
         }
         // printf("#GEN LEFT DONE\n");
         gen(node->rhs);
+        //rdiを退避する(関数呼び出しの引数が格納されているかもしれないので)
+        printf("  mov r9,rdi\n");
+
         printf("  pop rdi\n");
         printf("  pop rax\n");
 
@@ -230,12 +239,16 @@ void gen(Node *node)
             printf("  mov [rax], rdi\n");
         }
         printf("  push rdi\n");
+        //rdiを復元する
+        printf("  mov rdi,r9\n");
         return;
     case ND_CALL:
         for (int i = 0; node_args; i++)
         {
 
+            printf("#GEN ARG\n");
             gen(node_args->node);
+            printf("#GEN ARG DONE\n");
 
             printf("  pop rax\n");
             /*if (node_args->node->type->ty == INT)
@@ -259,6 +272,7 @@ void gen(Node *node)
         printf("  push rax\n");
         return;
     case ND_RETURN:
+        printf("#RETURN\n");
         //fprintf(stderr, "%d\n", node->lhs->kind == ND_DEREF);
         gen(node->lhs);
         printf("  pop rax\n");
@@ -367,6 +381,8 @@ void gen(Node *node)
     }
     gen(node->lhs);
     gen(node->rhs);
+    //rdiを退避する(関数呼び出しの引数が格納されているかもしれないので)
+    printf("  mov r9,rdi\n");
     printf("  pop rdi\n");
     printf("  pop rax\n");
 
@@ -421,4 +437,6 @@ void gen(Node *node)
         break;
     }
     printf("  push rax\n");
+    //rdiを復元する
+    printf("  mov rdi,r9\n");
 }

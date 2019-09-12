@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
         exit(1);
     }
     user_input = argv[1];
+    fprintf(stderr, "program: %s\n", argv[1]);
     //locals = calloc(1, sizeof(LVar));
     //locals->offset = 0;
     token = tokenize(argv[1]);
