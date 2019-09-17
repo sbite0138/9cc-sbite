@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
     {
         FILE *fp = fopen("ast.dot", "w");
         fprintf(fp, "digraph G {\n");
-        dumpAST(fp, code[0]);
+        for (int i = 0; code[i]; i++)
+            dumpAST(fp, code[i]);
         fprintf(fp, "}\n");
         fclose(fp);
         //return 0;
