@@ -104,7 +104,8 @@ void gen(Node *node)
     int current_label;
     Block *node_block = node->block;
     Arg *node_args = node->args;
-
+    LVar *cur = locals;
+    int argcnt = 0;
     char *name = calloc(128, sizeof(char));
 
     switch (node->kind)
@@ -116,12 +117,38 @@ void gen(Node *node)
         printf("  push rbp\n");
         printf("  mov rbp, rsp\n");
         printf("  sub rsp, 20800\n");
-        for (int i = 0; i < node->argnum; i++)
+        //最悪をします。ごめんなさい。
+        //localsを終端まで数えることで、関数内に登場する変数の数を得ます。そこからargmunを引くことで、引数の変数がどこから始まるかを得ます。
+        //とても汚いので、あとで直しましょう
+        while (cur != NULL)
+        {
+            argcnt++;
+            cur = cur->next;
+        }
+        argcnt -= node->argnum;
+        argcnt--;
+        //fprintf(stderr, "%d\n", argcnt);
+        cur = locals;
+        for (int i = 0; i < argcnt; i++)
+        {
+            cur = cur->next;
+        }
+
+        //localの情報を元に引数の読み込みをしたいのだけど、localは後に追加したものが先頭に来ている（つまり、localの先頭は一番最後の引数）ので、iを大きい方から回している
+        for (int i = node->argnum - 1; i >= 0; i--)
         {
             printf("  mov rax,  rbp\n");
-            printf("  sub rax,  %d\n", 8 + (i + 1) * 4); //char型に対応はできてない…
-
-            printf("  mov DWORD PTR[rax],  %s\n", arg_reg_32[i]);
+            printf("  sub rax,  %d\n", cur->offset);
+            print_type(cur->type);
+            if (cur->type->ty == INT)
+            {
+                printf("  mov DWORD PTR[rax],  %s\n", arg_reg_32[i]);
+            }
+            else if (cur->type->ty == PTR)
+            {
+                printf("  mov [rax],  %s\n", arg_reg_64[i]);
+            }
+            cur = cur->next;
         }
         gen(node->rhs);
         printf("  mov rsp,rbp\n");

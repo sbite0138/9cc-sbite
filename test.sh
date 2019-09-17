@@ -15,7 +15,6 @@ try() {
     exit 1
   fi
 }
-
 try 0  "int main(){ 0; }"
 try 101  "int main(){ 101; }"
 try 42  "int main(){ 42; }"
@@ -117,5 +116,7 @@ try 3 "int main(){char x[3];x[0] = -1;x[1] = 2;int y;y = 4;return x[0] + y;}"
 try 32 "char *c;int main(){char d;c=&d;*c=32;return d;}"
 try 32 "char c[12];int main(){char d;*c=32;return *c;}"
 try 97 'int main(){char *s;s="cat";return *(s+1);}'
+try 42 'int main(){int a[10];int *x; x=a;x[2]=42;return a[2];}'
+try 32 'int main(){int a[10];foo(a);return a[3];}int foo(int *x){x[3]=32;}'
 
 echo OK

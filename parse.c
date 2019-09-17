@@ -216,7 +216,7 @@ Token *tokenize(char *p)
     while (*p)
     {
         //fprintf(stderr, "%c\n", *p);
-        if (isspace(*p))
+        if (isspace(*p) || *p == '\n')
         {
             p++;
             continue;
@@ -456,10 +456,11 @@ Node *toplevel()
             {
                 LVar *lvar = calloc(1, sizeof(LVar));
                 lvar->type = decl_type();
+                print_type(lvar->type);
                 lvar->next = locals;
                 lvar->name = token->str;
                 lvar->len = token->len;
-                lvar->offset = locals->offset + 4;
+                lvar->offset = locals->offset + type_size(lvar->type);
                 locals = lvar;
                 node->argnum += 1;
                 next_token();
@@ -905,12 +906,34 @@ Node *term()
                 }
                 else
                 {
-                    node->offset = lvar->offset;
-                    node->type = lvar->type;
-                    if (var_type == ND_GVAR)
+                    if (consume("[") && lvar->type->ty == PTR)
                     {
-                        node->gvarname = lvar->name;
-                        node->gvarnamelen = lvar->len;
+                        node->kind = ND_DEREF;
+                        Node *node_lvar = calloc(1, sizeof(Node));
+                        node_lvar->kind = var_type;
+                        node_lvar->offset = lvar->offset;
+                        node_lvar->type = calloc(1, sizeof(Type));
+                        node_lvar->type->ty = PTR;
+                        node_lvar->type->ptr_to = lvar->type->ptr_to;
+                        if (var_type == ND_GVAR)
+                        {
+                            node_lvar->gvarname = lvar->name;
+                            node_lvar->gvarnamelen = lvar->len;
+                        }
+                        Node *node_index = add();
+                        node->rhs = new_node(ND_ADD, node_lvar, node_index);
+                        node->type = node->rhs->type->ptr_to;
+                        expect("]");
+                    }
+                    else
+                    {
+                        node->offset = lvar->offset;
+                        node->type = lvar->type;
+                        if (var_type == ND_GVAR)
+                        {
+                            node->gvarname = lvar->name;
+                            node->gvarnamelen = lvar->len;
+                        }
                     }
                 }
             }
