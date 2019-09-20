@@ -127,7 +127,7 @@ void gen(Node *node)
         }
         argcnt -= node->argnum;
         argcnt--;
-        //fprintf(stderr, "%d\n", argcnt);
+        fprintf(stderr, "%d\n", argcnt);
         cur = locals;
         for (int i = 0; i < argcnt; i++)
         {
@@ -270,6 +270,8 @@ void gen(Node *node)
         printf("  mov rdi,r9\n");
         return;
     case ND_CALL:
+        //普通にgen()した後にレジスタに代入ってすると、例えばf(1,f(2,3,4),5)みたいなときに壊れる（f(...）を実行するまでに2つの引数を保管する
+        //必要があるので（ほんまか？））ので、一旦全部genしてからforでレジスタにpopしていきます
         for (int i = 0; node_args; i++)
         {
 
@@ -277,19 +279,21 @@ void gen(Node *node)
             gen(node_args->node);
             printf("#GEN ARG DONE\n");
 
-            printf("  pop rax\n");
+            //printf("  pop rax\n");
             /*if (node_args->node->type->ty == INT)
             {
                 printf("  mov %s, eax\n", arg_reg_32[i]);
             }
             else
             */
-            {
-                printf("  mov %s, rax\n", arg_reg_64[i]);
-            }
-
             node_args = node_args->next;
             //fprintf(stderr, "hoge");
+        }
+        node_args = node->args;
+        //fprintf(stderr, "argnum:%d\n", node->argnum);
+        for (int i = node->argnum - 1; i >= 0; i--)
+        {
+            printf("  pop %s\n", arg_reg_64[i]);
         }
         //fprintf(stderr, "done\n");
 

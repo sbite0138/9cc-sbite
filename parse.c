@@ -314,6 +314,10 @@ Token *tokenize(char *p)
             //fprintf(stderr, "str\n");
             while (*(p + len) != '\"')
             {
+                if (*(p + len) == '\\')
+                {
+                    len++;
+                }
                 len++;
             }
             len++;
@@ -819,6 +823,7 @@ Node *term()
             node->type->ty = INT;
             node->funcname = tok->str;
             node->funcnamelen = tok->len;
+            node->argnum = 0;
             Arg *curarg = node->args;
             if (!check_token(")"))
             {
@@ -826,6 +831,7 @@ Node *term()
                 {
 
                     curarg->node = expr();
+                    node->argnum++;
                     //curarg->node->kind = ND_NUM;
                     if (!consume(","))
                         break;
