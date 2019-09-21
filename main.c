@@ -2,16 +2,30 @@
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2)
+    if (argc != 3 && argc != 2)
     {
-        fprintf(stderr, "引数の個数が正しくありません\n");
+        fprintf(stderr, "Usage: %s (-e filiname | source code)\n", argv[0]);
         exit(1);
     }
-    user_input = argv[1];
-    fprintf(stderr, "program: %s\n", argv[1]);
+    if (argc == 2)
+    {
+        user_input = read_file(argv[1]);
+    }
+    else
+    {
+
+        if (strcmp(argv[1], "-e") != 0)
+        {
+            fprintf(stderr, "Unknown option: %s\n", argv[1]);
+            exit(1);
+        }
+
+        user_input = argv[2];
+    }
+    fprintf(stderr, "program: %s\n", argv[2]);
     //locals = calloc(1, sizeof(LVar));
     //locals->offset = 0;
-    token = tokenize(argv[1]);
+    token = tokenize(user_input);
     //fprintf(stderr, "tokenize() done\n");
 
     arg_reg_32 = (char **)calloc(6, 16 * sizeof(char));

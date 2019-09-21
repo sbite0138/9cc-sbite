@@ -160,6 +160,8 @@ void print_type(Type *type);
 
 int type_size(Type *type);
 
+char *read_file(char *path);
+
 void node_name(NodeKind kind, char *s);
 void dumpAST(FILE *fp, Node *node);
 extern Token *token;

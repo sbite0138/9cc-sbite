@@ -80,24 +80,28 @@ int check(int *b)
 {
     int y;
     int x;
-    for (y = 0; y < 9; y = y + 1)
+
+    for (x = 0; x < 9; x = x + 1)
     {
-        for (x = 0; x < 9; x = x + 1)
+        if (checky(b, x) == 0)
         {
-            if (checky(b, x) == 0)
-            {
-                return 0;
-            }
-            if (checkx(b, y) == 0)
-            {
-                return 0;
-            }
-            if (check3x3(b, y, x) == 0)
-            {
-                return 0;
-            }
+            return 0;
         }
     }
+    for (y = 0; y < 9; y = y + 1)
+    {
+        if (checkx(b, y) == 0)
+        {
+            return 0;
+        }
+    }
+    for (x = 0; x < 3; x = x + 1)
+        for (y = 0; y < 3; y = y + 1)
+            if (check3x3(b, y * 3, x * 3) == 0)
+            {
+                return 0;
+            }
+
     return 1;
 }
 int complete(int *b)
