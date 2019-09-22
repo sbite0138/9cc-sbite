@@ -12,42 +12,56 @@ int main()
         memory[i] = 0;
     }
     scanf("%s", code);
-    printf("%c", code[2]);
+
     while (code[pcindex] != 0)
     {
-        printf("%c\n", code[pcindex]);
-        if (code[pcindex] == ',')
-        {
-            printf("yay!\n");
-        }
         if (code[pcindex] == '>')
         {
 
             memindex = memindex + 1;
+            if (memindex == 3000)
+            {
+                memindex = 0;
+            }
         }
         else if (code[pcindex] == '<')
         {
             memindex = memindex - 1;
+            if (memindex == -1)
+            {
+                memindex = 2999;
+            }
         }
         else if (code[pcindex] == '+')
         {
             memory[memindex] = memory[memindex] + 1;
             if (memory[memindex] == 256)
+            {
                 memory[memindex] = 0;
+            }
         }
         else if (code[pcindex] == '-')
         {
             memory[memindex] = memory[memindex] - 1;
             if (memory[memindex] == -1)
+            {
                 memory[memindex] = 255;
+            }
         }
         else if (code[pcindex] == '[')
         {
             if (memory[memindex] == 0)
             {
-                while (code[pcindex] != ']')
+
+                int stack;
+                stack = 1;
+                while (stack != 0)
                 {
                     pcindex = pcindex + 1;
+                    if (code[pcindex] == ']')
+                        stack = stack - 1;
+                    if (code[pcindex] == '[')
+                        stack = stack + 1;
                 }
             }
         }
@@ -55,15 +69,20 @@ int main()
         {
             if (memory[memindex] != 0)
             {
-                while (code[pcindex] != '[')
+                int stack;
+                stack = 1;
+                while (stack != 0)
                 {
                     pcindex = pcindex - 1;
+                    if (code[pcindex] == ']')
+                        stack = stack + 1;
+                    if (code[pcindex] == '[')
+                        stack = stack - 1;
                 }
             }
         }
         else if (code[pcindex] == '.')
         {
-
             char c;
             c = memory[memindex];
             printf("%c", c);
@@ -71,10 +90,19 @@ int main()
         else if (code[pcindex] == ',')
         {
 
-            printf("scanf\n");
             char c;
-            scanf("%c", c);
+            scanf(" %c", &c);
+
             memory[memindex] = c;
+        }
+        else if (code[pcindex] == '@')
+        {
+            int i;
+            for (i = 0; i < 16; i = i + 1)
+            {
+                printf("%d ", memory[i]);
+            }
+            printf("\n", memory[i]);
         }
         else
         {

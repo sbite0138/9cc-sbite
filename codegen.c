@@ -184,6 +184,11 @@ void gen(Node *node)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
         }
+        // charも必要ですね。それはそう
+        else if (node->rhs->type->ptr_to->ty == CHAR)
+        {
+            printf("  movsx eax, BYTE  PTR[rax]");
+        }
         else
         {
             printf("  mov rax, [rax]\n");
