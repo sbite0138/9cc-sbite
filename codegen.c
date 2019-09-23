@@ -116,7 +116,7 @@ void gen(Node *node)
         printf("%s:\n", name);
         printf("  push rbp\n");
         printf("  mov rbp, rsp\n");
-        printf("  sub rsp, 20800\n");
+        printf("  sub rsp, %d\n", locals->offset);
         //最悪をします。ごめんなさい。
         //localsを終端まで数えることで、関数内に登場する変数の数を得ます。そこからargmunを引くことで、引数の変数がどこから始まるかを得ます。
         //とても汚いので、あとで直しましょう
@@ -187,7 +187,7 @@ void gen(Node *node)
         // charも必要ですね。それはそう
         else if (node->rhs->type->ptr_to->ty == CHAR)
         {
-            printf("  movsx eax, BYTE  PTR[rax]");
+            printf("  movsx eax, BYTE  PTR[rax]\n");
         }
         else
         {
