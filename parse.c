@@ -427,6 +427,10 @@ void decl_lvar()
 
         lvar->offset = locals->offset + 4 * size;
     }
+    else if (lvar->type->ty == CHAR)
+    {
+        lvar->offset = locals->offset + size;
+    }
     else
     {
         lvar->offset = locals->offset + 8 * size;
