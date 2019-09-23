@@ -116,7 +116,8 @@ void gen(Node *node)
         printf("%s:\n", name);
         printf("  push rbp\n");
         printf("  mov rbp, rsp\n");
-        printf("  sub rsp, %d\n", locals->offset);
+        //rspが16の倍数でないと落ちます
+        printf("  sub rsp, %d\n", locals->offset + 16 - (locals->offset % 16));
         //最悪をします。ごめんなさい。
         //localsを終端まで数えることで、関数内に登場する変数の数を得ます。そこからargmunを引くことで、引数の変数がどこから始まるかを得ます。
         //とても汚いので、あとで直しましょう
