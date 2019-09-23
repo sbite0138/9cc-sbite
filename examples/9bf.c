@@ -1,13 +1,13 @@
 int main()
 {
-    char code[4096];
-    int memory[4096];
+    char code[8192];
+    int memory[8192];
     int i;
     int pcindex;
     int memindex;
     pcindex = 0;
     memindex = 0;
-    for (i = 0; i < 4096; i = i + 1)
+    for (i = 0; i < 8192; i = i + 1)
     {
         memory[i] = 0;
     }
@@ -19,7 +19,7 @@ int main()
         {
 
             memindex = memindex + 1;
-            if (memindex == 3000)
+            if (memindex == 8192)
             {
                 memindex = 0;
             }
@@ -29,7 +29,7 @@ int main()
             memindex = memindex - 1;
             if (memindex == -1)
             {
-                memindex = 2999;
+                memindex = 8191;
             }
         }
         else if (code[pcindex] == '+')
@@ -106,7 +106,6 @@ int main()
         }
         else
         {
-            printf("none\n");
         }
         pcindex = pcindex + 1;
     }

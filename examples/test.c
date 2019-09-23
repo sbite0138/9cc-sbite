@@ -1,6 +1,6 @@
 int main()
 {
-    char *s;
-    s = ",,,";
-    return s[0] == ',';
+    char s[10];
+    s[9] = 32;
+    return s[9];
 }
