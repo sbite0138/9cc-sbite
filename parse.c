@@ -3,6 +3,17 @@ Token *token;
 char *user_input;
 Node *code[1024];
 LVar *func_variables[256];
+
+Node *new_node_num(int val)
+{
+    Node *node = calloc(1, sizeof(Node));
+    node->kind = ND_NUM;
+    node->val = val;
+    node->type = calloc(1, sizeof(Type));
+    node->type->ty = INT; // calloc(1, sizeof(Type));
+    return node;
+}
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
 
@@ -22,13 +33,19 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
             error("ポインタ同士の加算/減算です:%s", token->str);
         }
         // int+int=int
-        if (lhs->type->ty == INT && rhs->type->ty == INT)
+        else if (lhs->type->ty == INT && rhs->type->ty == INT)
         {
 
             node->type->ty = INT;
         }
         // char+char=int (ほんとうです https://wandbox.org/permlink/PtkWNhW6gY0Qz3RB)
-        if (lhs->type->ty == CHAR && rhs->type->ty == CHAR)
+        else if (lhs->type->ty == CHAR && rhs->type->ty == CHAR)
+        {
+
+            node->type->ty = INT;
+        }
+        // char+int=int
+        else if ((lhs->type->ty == CHAR && rhs->type->ty == INT) || (lhs->type->ty == INT && rhs->type->ty == CHAR))
         {
 
             node->type->ty = INT;
@@ -36,22 +53,41 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
         // array+int=array
         else if ((lhs->type->ty == ARRAY && rhs->type->ty == INT) || (lhs->type->ty == INT && rhs->type->ty == ARRAY))
         {
-            node->type->ty = ARRAY;
+            if (lhs->type->ty == ARRAY)
+            {
+                node->type = lhs->type;
+            }
+            else
+            {
+                node->type = rhs->type;
+            }
         }
         // array+char=array (あるのか？)
         else if ((lhs->type->ty == ARRAY && rhs->type->ty == CHAR) || (lhs->type->ty == CHAR && rhs->type->ty == ARRAY))
         {
-            node->type->ty = ARRAY;
+            if (lhs->type->ty == ARRAY)
+            {
+                node->type = lhs->type;
+            }
+            else
+            {
+                node->type = rhs->type;
+            }
         }
         else
         {
             // PTR+INTみたいな式のこと…？
             if (lhs->type->ty == INT)
             {
+                assert(rhs->type->ty == PTR);
+                //fprintf(stderr, "%d\n", rhs->type->ty);
+                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->ptr_to)));
                 node->type = rhs->type;
             }
             else
             {
+                assert(lhs->type->ty == PTR);
+                node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->ptr_to)));
                 node->type = lhs->type;
             }
             //  fprintf(stderr, "%d\n", node->type->ty == PTR);
@@ -80,16 +116,6 @@ void print_type(Type *type)
         print_type(type->ptr_to);
         return;
     }
-}
-
-Node *new_node_num(int val)
-{
-    Node *node = calloc(1, sizeof(Node));
-    node->kind = ND_NUM;
-    node->val = val;
-    node->type = calloc(1, sizeof(Type));
-    node->type->ty = INT; // calloc(1, sizeof(Type));
-    return node;
 }
 
 void error(char *fmt, ...)
@@ -323,7 +349,7 @@ Token *tokenize(char *p)
             len++;
             cur = new_token(TK_STR, cur, p, len);
             p += len;
-            fprintf(stderr, "%s\n", p);
+            //fprintf(stderr, "%s\n", p);
             continue;
         }
         else if (isalpha(*p))
@@ -443,10 +469,6 @@ void decl_lvar()
     {
         lvar->type = head;
     }
-    if (lvar->type->ty == ARRAY)
-    {
-        print_type(lvar->type);
-    }
 
     if (lvar->type->ty == INT)
     {
@@ -490,7 +512,7 @@ Node *toplevel()
             {
                 LVar *lvar = calloc(1, sizeof(LVar));
                 lvar->type = decl_type();
-                print_type(lvar->type);
+                //print_type(lvar->type);
                 lvar->next = locals;
                 lvar->name = token->str;
                 lvar->len = token->len;
@@ -914,13 +936,19 @@ Node *term()
                         node_addr->kind = ND_ADDR;
                         node_addr->rhs = node_lvar;
                         node_addr->type = calloc(1, sizeof(Type));
-                        node_addr->type->ty = PTR;
+                        node_addr->type->ty = ARRAY;
                         node_addr->type->ptr_to = node_lvar->type->ptr_to;
-
-                        Node *node_index = add();
-                        node->rhs = new_node(ND_ADD, node_addr, node_index);
-                        node->type = node->rhs->type->ptr_to;
-                        expect("]");
+                        node->rhs = node_addr;
+                        Type *cur = lvar->type;
+                        do
+                        {
+                            Node *node_index = add();
+                            Node *mul_node = new_node(ND_MUL, node_index, new_node_num(type_size(cur->ptr_to)));
+                            cur = cur->ptr_to;
+                            node->rhs = new_node(ND_ADD, node->rhs, mul_node);
+                            node->type = node->rhs->type->ptr_to;
+                            expect("]");
+                        } while (consume("["));
                     }
                     else
                     {

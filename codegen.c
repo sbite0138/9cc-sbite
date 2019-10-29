@@ -2,22 +2,6 @@
 int label;
 char **arg_reg_32;
 char **arg_reg_64;
-int type_size(Type *type)
-{
-    if (type->ty == CHAR)
-    {
-        return 1;
-    }
-    if (type->ty == INT)
-    {
-        return 4;
-    }
-    if (type->ty == PTR)
-    {
-        return 8;
-    }
-    error("不明なタイプです:%d", type->ty);
-}
 
 void gen_globals()
 {
@@ -40,7 +24,7 @@ void gen_strings()
     char *str = calloc(128, sizeof(char));
     for (; cur != NULL; cur = cur->next)
     {
-        fprintf(stderr, "strings : %s\n", cur->str);
+        //fprintf(stderr, "strings : %s\n", cur->str);
         strncpy(str, cur->str, cur->len);
         str[cur->len] = '\0';
         printf(".LC%d:\n", cur->id);
@@ -128,7 +112,7 @@ void gen(Node *node)
         }
         argcnt -= node->argnum;
         argcnt--;
-        fprintf(stderr, "%d\n", argcnt);
+        //fprintf(stderr, "%d\n", argcnt);
         cur = locals;
         for (int i = 0; i < argcnt; i++)
         {
@@ -140,7 +124,7 @@ void gen(Node *node)
         {
             printf("  mov rax,  rbp\n");
             printf("  sub rax,  %d\n", cur->offset);
-            print_type(cur->type);
+            //print_type(cur->type);
             if (cur->type->ty == INT)
             {
                 printf("  mov DWORD PTR[rax],  %s\n", arg_reg_32[i]);
@@ -427,17 +411,17 @@ void gen(Node *node)
     {
 
     case ND_ADD:
-        if (node->type->ty == PTR)
-        {
-            gen_ptr(node);
-        }
+        //if (node->type->ty == PTR)
+        //{
+        //   gen_ptr(node);
+        //}
         printf("  add rax, rdi\n");
         break;
     case ND_SUB:
-        if (node->type->ty == PTR)
-        {
-            gen_ptr(node);
-        }
+        //if (node->type->ty == PTR)
+        //{
+        //   gen_ptr(node);
+        //}
         printf("  sub rax, rdi\n");
         break;
     case ND_MUL:

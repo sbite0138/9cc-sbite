@@ -145,3 +145,24 @@ char *read_file(char *path)
     fclose(fp);
     return buf;
 }
+
+int type_size(Type *type)
+{
+    if (type->ty == CHAR)
+    {
+        return 1;
+    }
+    if (type->ty == INT)
+    {
+        return 4;
+    }
+    if (type->ty == PTR)
+    {
+        return 8;
+    }
+    if (type->ty == ARRAY)
+    {
+        return type->array_size * type_size(type->ptr_to);
+    }
+    error("不明なタイプです:%d", type->ty);
+}

@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 
         user_input = argv[2];
     }
-    fprintf(stderr, "program: %s\n", user_input);
+    //fprintf(stderr, "program: %s\n", user_input);
     //locals = calloc(1, sizeof(LVar));
     //locals->offset = 0;
     token = tokenize(user_input);
