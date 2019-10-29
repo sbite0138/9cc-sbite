@@ -405,6 +405,7 @@ void decl_lvar()
     LVar *lvar = calloc(1, sizeof(LVar));
     Type *base = decl_type();
     Type *head = NULL;
+    Type *cur = NULL;
     lvar->next = locals;
     lvar->name = token->str;
     lvar->type = calloc(1, sizeof(Type));
@@ -413,7 +414,7 @@ void decl_lvar()
     int size = 1;
     while (consume("["))
     {
-        //head->base #=> head->node->base にする
+        //head->...->cur->base #=> head->...->cur->node->base にする
         Type *node = calloc(1, sizeof(Type));
 
         node->ty = ARRAY;
@@ -423,10 +424,12 @@ void decl_lvar()
         if (head == NULL)
         {
             head = node;
+            cur = node;
         }
         else
         {
-            head->ptr_to = node;
+            cur->ptr_to = node;
+            cur = node;
         }
         size *= token->val;
         next_token();
