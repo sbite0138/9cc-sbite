@@ -76,7 +76,7 @@ void print_type(Type *type)
         print_type(type->ptr_to);
         return;
     case ARRAY:
-        fprintf(stderr, "ARRAY->");
+        fprintf(stderr, "ARRAY[%d]->", type->array_size);
         print_type(type->ptr_to);
         return;
     }
@@ -403,23 +403,46 @@ Type *decl_type()
 void decl_lvar()
 {
     LVar *lvar = calloc(1, sizeof(LVar));
-    lvar->type = decl_type();
+    Type *base = decl_type();
+    Type *head = NULL;
     lvar->next = locals;
     lvar->name = token->str;
+    lvar->type = calloc(1, sizeof(Type));
     lvar->len = token->len;
     next_token();
     int size = 1;
-
     while (consume("["))
     {
-        Type *next = calloc(1, sizeof(Type));
-        next->ty = ARRAY;
-        next->ptr_to = lvar->type;
-        lvar->type = next;
+        //head->base #=> head->node->base にする
+        Type *node = calloc(1, sizeof(Type));
 
-        size = token->val;
+        node->ty = ARRAY;
+        node->array_size = token->val;
+
+        node->ptr_to = base;
+        if (head == NULL)
+        {
+            head = node;
+        }
+        else
+        {
+            head->ptr_to = node;
+        }
+        size *= token->val;
         next_token();
         expect("]");
+    }
+    if (head == NULL)
+    {
+        lvar->type = base;
+    }
+    else
+    {
+        lvar->type = head;
+    }
+    if (lvar->type->ty == ARRAY)
+    {
+        print_type(lvar->type);
     }
 
     if (lvar->type->ty == INT)

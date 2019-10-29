@@ -111,6 +111,22 @@ void dumpAST(FILE *fp, Node *node)
     }
 }
 
+int get_array_offset(Type *type)
+{
+    if (type->ty != ARRAY)
+    {
+        error("call get_array_offset with not ARRAY type\n");
+    }
+    int offset = 1;
+    Type *cur = type;
+    while (cur->ty == ARRAY)
+    {
+        offset *= cur->array_size;
+        cur = cur->ptr_to;
+    }
+    return offset;
+}
+
 char *read_file(char *path)
 {
     FILE *fp = fopen(path, "r");

@@ -80,6 +80,7 @@ struct Type
         ARRAY
     } ty;
     Type *ptr_to;
+    int array_size; //tyがARRAYだった場合、その要素数 例えばint a[2][3][4]のとき、a[0]は3,a[0][0]は4
 };
 
 struct Node
@@ -159,7 +160,7 @@ Arg *next_arg(Arg *cur);
 void print_type(Type *type);
 
 int type_size(Type *type);
-
+int get_array_offset(Type *type);
 char *read_file(char *path);
 
 void node_name(NodeKind kind, char *s);

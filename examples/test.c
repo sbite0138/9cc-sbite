@@ -1,5 +1,5 @@
 int main()
 {
-    char s[10];
-    scanf("%s", s);
+    int *****a[10][3];
+    return 0;
 }
