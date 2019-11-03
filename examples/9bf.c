@@ -1,25 +1,24 @@
 int main()
 {
-    char code[8192];
-    int memory[8192];
+    char code[18192];
+    int memory[18192];
     int i;
     int pcindex;
     int memindex;
     pcindex = 0;
     memindex = 0;
-    for (i = 0; i < 8192; i = i + 1)
+    for (i = 0; i < 18192; i = i + 1)
     {
         memory[i] = 0;
     }
     scanf("%s", code);
-
     while (code[pcindex] != 0)
     {
         if (code[pcindex] == '>')
         {
 
             memindex = memindex + 1;
-            if (memindex == 8192)
+            if (memindex == 18192)
             {
                 memindex = 0;
             }
@@ -29,7 +28,7 @@ int main()
             memindex = memindex - 1;
             if (memindex == -1)
             {
-                memindex = 8191;
+                memindex = 18191;
             }
         }
         else if (code[pcindex] == '+')
@@ -102,7 +101,7 @@ int main()
             {
                 printf("%d ", memory[i]);
             }
-            printf("\n", memory[i]);
+            printf("\n");
         }
         else
         {

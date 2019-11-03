@@ -120,4 +120,5 @@ try 42 'int main(){int a[10];int *x; x=a;x[2]=42;return a[2];}'
 try 32 'int main(){int a[10];foo(a);return a[3];}int foo(int *x){x[3]=32;}'
 try 103 'int main(){ return foo(foo(1,2),foo(foo(32,64),4));}int foo(int a,int b){return a+b;}'
 try 5 'int main(){ return bar(foo(8,2),foo(bar(10,9),4));}int bar(int x,int y){return x-y;}int foo(int a,int b){return a+b;}'
+try 14 'int main(){int a[10][10];a[3][3]=3;a[9][2]=11;return a[3][3]+a[9][2];}'
 echo OK
