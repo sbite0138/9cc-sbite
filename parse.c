@@ -79,14 +79,17 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
             // PTR+INTみたいな式のこと…？
             if (lhs->type->ty == INT)
             {
-                assert(rhs->type->ty == PTR);
-                //fprintf(stderr, "%d\n", rhs->type->ty);
+                //assert(rhs->type->ty == PTR);
+
+                fprintf(stderr, "%d\n", rhs->type->ty);
                 node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->ptr_to)));
                 node->type = rhs->type;
             }
             else
             {
-                assert(lhs->type->ty == PTR);
+                //assert(lhs->type->ty == PTR);
+                fprintf(stderr, "%d\n", rhs->type->ty);
+
                 node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->ptr_to)));
                 node->type = lhs->type;
             }
@@ -939,6 +942,7 @@ Node *term()
                         node_addr->type->ty = ARRAY;
                         node_addr->type->ptr_to = node_lvar->type->ptr_to;
                         node->rhs = node_addr;
+                        node->type = node->rhs->type;
                         Type *cur = lvar->type;
                         do
                         {
@@ -946,9 +950,14 @@ Node *term()
                             Node *mul_node = new_node(ND_MUL, node_index, new_node_num(type_size(cur->ptr_to)));
                             cur = cur->ptr_to;
                             node->rhs = new_node(ND_ADD, node->rhs, mul_node);
-                            node->type = node->rhs->type->ptr_to;
+                            node->type = node->type->ptr_to;
                             expect("]");
                         } while (consume("["));
+                        //node->type = calloc(1, sizeof(Type));
+
+                        //print_type(node->type);
+
+                        //node->type = node->type->ptr_to;
                     }
                     else
                     {
