@@ -1,9 +1,11 @@
+
+int foo(int a[10])
+{
+
+    return 42;
+}
 int main()
 {
-    int a[10][10][20];
-    int b[2];
-    a[3][3][2] = 3;
-    a[9][2][2] = 11;
-    b[0] = 32;
-    return a[3][3][2] + b[0] + a[9][2][2];
+    int a[10];
+    return foo(a);
 }

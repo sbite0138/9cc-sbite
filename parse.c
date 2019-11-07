@@ -134,9 +134,16 @@ void error_at(char *loc, char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-
-    int pos = loc - user_input;
-    fprintf(stderr, "%s\n", user_input);
+    char *line = loc;
+    while (user_input < line && line[-1] != '\n') //負のインデックスはUB？
+    {
+        line--;
+    }
+    char *end = loc;
+    while (*end != '\n')
+        end++;
+    int pos = loc - line;
+    fprintf(stderr, "%.*s\n", (int)(end - line), line);
     fprintf(stderr, "%*s", pos, " ");
     fprintf(stderr, "^ ");
     vfprintf(stderr, fmt, ap);
