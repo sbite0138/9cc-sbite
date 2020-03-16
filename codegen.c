@@ -437,22 +437,22 @@ void gen(Node *node)
         printf("  mov rax, rdx\n");
         break;
     case ND_EQ:
-        printf("  cmp rax, rdi\n");
+        printf("  cmp eax, edi\n");
         printf("  sete al\n");
         printf("  movzb rax, al\n");
         break;
     case ND_NEQ:
-        printf("  cmp rax, rdi\n");
+        printf("  cmp eax, edi\n");
         printf("  setne al\n");
         printf("  movzb rax, al\n");
         break;
     case ND_LT:
-        printf("  cmp rax, rdi\n");
+        printf("  cmp eax, edi\n");
         printf("  setl al\n");
         printf("  movzb rax, al\n");
         break;
     case ND_LEQ:
-        printf("  cmp rax, rdi\n");
+        printf("  cmp eax, edi\n");
         printf("  setle al\n");
         printf("  movzb rax, al\n");
         break;
