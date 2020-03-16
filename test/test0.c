@@ -675,429 +675,546 @@ int test105()
 
 int main()
 {
+    int errnum;
+    errnum = 0;
     if (test0() != 0)
     {
+        errnum = errnum + 1;
         printf("test0() faild (actual:%d expect:%d)\n", test0(), 0);
     }
     if (test1() != 101)
     {
+        errnum = errnum + 1;
         printf("test1() faild (actual:%d expect:%d)\n", test1(), 101);
     }
     if (test2() != 42)
     {
+        errnum = errnum + 1;
         printf("test2() faild (actual:%d expect:%d)\n", test2(), 42);
     }
     if (test3() != 0)
     {
+        errnum = errnum + 1;
         printf("test3() faild (actual:%d expect:%d)\n", test3(), 0);
     }
     if (test4() != 0)
     {
+        errnum = errnum + 1;
         printf("test4() faild (actual:%d expect:%d)\n", test4(), 0);
     }
     if (test5() != 41)
     {
+        errnum = errnum + 1;
         printf("test5() faild (actual:%d expect:%d)\n", test5(), 41);
     }
     if (test6() != 2)
     {
+        errnum = errnum + 1;
         printf("test6() faild (actual:%d expect:%d)\n", test6(), 2);
     }
     if (test7() != 47)
     {
+        errnum = errnum + 1;
         printf("test7() faild (actual:%d expect:%d)\n", test7(), 47);
     }
     if (test8() != 15)
     {
+        errnum = errnum + 1;
         printf("test8() faild (actual:%d expect:%d)\n", test8(), 15);
     }
     if (test9() != 4)
     {
+        errnum = errnum + 1;
         printf("test9() faild (actual:%d expect:%d)\n", test9(), 4);
     }
     if (test10() != 13)
     {
+        errnum = errnum + 1;
         printf("test10() faild (actual:%d expect:%d)\n", test10(), 13);
     }
     if (test11() != 4)
     {
+        errnum = errnum + 1;
         printf("test11() faild (actual:%d expect:%d)\n", test11(), 4);
     }
     if (test12() != 4)
     {
+        errnum = errnum + 1;
         printf("test12() faild (actual:%d expect:%d)\n", test12(), 4);
     }
     if (test13() != 3)
     {
+        errnum = errnum + 1;
         printf("test13() faild (actual:%d expect:%d)\n", test13(), 3);
     }
     if (test14() != 1)
     {
+        errnum = errnum + 1;
         printf("test14() faild (actual:%d expect:%d)\n", test14(), 1);
     }
     if (test15() != 0)
     {
+        errnum = errnum + 1;
         printf("test15() faild (actual:%d expect:%d)\n", test15(), 0);
     }
     if (test16() != 1)
     {
+        errnum = errnum + 1;
         printf("test16() faild (actual:%d expect:%d)\n", test16(), 1);
     }
     if (test17() != 1)
     {
+        errnum = errnum + 1;
         printf("test17() faild (actual:%d expect:%d)\n", test17(), 1);
     }
     if (test18() != 1)
     {
+        errnum = errnum + 1;
         printf("test18() faild (actual:%d expect:%d)\n", test18(), 1);
     }
     if (test19() != 0)
     {
+        errnum = errnum + 1;
         printf("test19() faild (actual:%d expect:%d)\n", test19(), 0);
     }
     if (test20() != 1)
     {
+        errnum = errnum + 1;
         printf("test20() faild (actual:%d expect:%d)\n", test20(), 1);
     }
     if (test21() != 1)
     {
+        errnum = errnum + 1;
         printf("test21() faild (actual:%d expect:%d)\n", test21(), 1);
     }
     if (test22() != 1)
     {
+        errnum = errnum + 1;
         printf("test22() faild (actual:%d expect:%d)\n", test22(), 1);
     }
     if (test23() != 1)
     {
+        errnum = errnum + 1;
         printf("test23() faild (actual:%d expect:%d)\n", test23(), 1);
     }
     if (test24() != 1)
     {
+        errnum = errnum + 1;
         printf("test24() faild (actual:%d expect:%d)\n", test24(), 1);
     }
     if (test25() != 0)
     {
+        errnum = errnum + 1;
         printf("test25() faild (actual:%d expect:%d)\n", test25(), 0);
     }
     if (test26() != 1)
     {
+        errnum = errnum + 1;
         printf("test26() faild (actual:%d expect:%d)\n", test26(), 1);
     }
     if (test27() != 1)
     {
+        errnum = errnum + 1;
         printf("test27() faild (actual:%d expect:%d)\n", test27(), 1);
     }
     if (test28() != 1)
     {
+        errnum = errnum + 1;
         printf("test28() faild (actual:%d expect:%d)\n", test28(), 1);
     }
     if (test29() != 1)
     {
+        errnum = errnum + 1;
         printf("test29() faild (actual:%d expect:%d)\n", test29(), 1);
     }
     if (test30() != 1)
     {
+        errnum = errnum + 1;
         printf("test30() faild (actual:%d expect:%d)\n", test30(), 1);
     }
     if (test31() != 1)
     {
+        errnum = errnum + 1;
         printf("test31() faild (actual:%d expect:%d)\n", test31(), 1);
     }
     if (test32() != 3)
     {
+        errnum = errnum + 1;
         printf("test32() faild (actual:%d expect:%d)\n", test32(), 3);
     }
     if (test33() != 4)
     {
+        errnum = errnum + 1;
         printf("test33() faild (actual:%d expect:%d)\n", test33(), 4);
     }
     if (test34() != 3)
     {
+        errnum = errnum + 1;
         printf("test34() faild (actual:%d expect:%d)\n", test34(), 3);
     }
     if (test35() != 3)
     {
+        errnum = errnum + 1;
         printf("test35() faild (actual:%d expect:%d)\n", test35(), 3);
     }
     if (test36() != 100)
     {
+        errnum = errnum + 1;
         printf("test36() faild (actual:%d expect:%d)\n", test36(), 100);
     }
     if (test37() != 0)
     {
+        errnum = errnum + 1;
         printf("test37() faild (actual:%d expect:%d)\n", test37(), 0);
     }
     if (test38() != 3)
     {
+        errnum = errnum + 1;
         printf("test38() faild (actual:%d expect:%d)\n", test38(), 3);
     }
     if (test39() != 2)
     {
+        errnum = errnum + 1;
         printf("test39() faild (actual:%d expect:%d)\n", test39(), 2);
     }
     if (test40() != 3)
     {
+        errnum = errnum + 1;
         printf("test40() faild (actual:%d expect:%d)\n", test40(), 3);
     }
     if (test41() != 2)
     {
+        errnum = errnum + 1;
         printf("test41() faild (actual:%d expect:%d)\n", test41(), 2);
     }
     if (test42() != 100)
     {
+        errnum = errnum + 1;
         printf("test42() faild (actual:%d expect:%d)\n", test42(), 100);
     }
     if (test43() != 11)
     {
+        errnum = errnum + 1;
         printf("test43() faild (actual:%d expect:%d)\n", test43(), 11);
     }
     if (test44() != 4)
     {
+        errnum = errnum + 1;
         printf("test44() faild (actual:%d expect:%d)\n", test44(), 4);
     }
     if (test45() != 1)
     {
+        errnum = errnum + 1;
         printf("test45() faild (actual:%d expect:%d)\n", test45(), 1);
     }
     if (test46() != 3)
     {
+        errnum = errnum + 1;
         printf("test46() faild (actual:%d expect:%d)\n", test46(), 3);
     }
     if (test47() != 3)
     {
+        errnum = errnum + 1;
         printf("test47() faild (actual:%d expect:%d)\n", test47(), 3);
     }
     if (test48() != 3)
     {
+        errnum = errnum + 1;
         printf("test48() faild (actual:%d expect:%d)\n", test48(), 3);
     }
     if (test49() != 1)
     {
+        errnum = errnum + 1;
         printf("test49() faild (actual:%d expect:%d)\n", test49(), 1);
     }
     if (test50() != 55)
     {
+        errnum = errnum + 1;
         printf("test50() faild (actual:%d expect:%d)\n", test50(), 55);
     }
     if (test51() != 55)
     {
+        errnum = errnum + 1;
         printf("test51() faild (actual:%d expect:%d)\n", test51(), 55);
     }
     if (test52() != 55)
     {
+        errnum = errnum + 1;
         printf("test52() faild (actual:%d expect:%d)\n", test52(), 55);
     }
     if (test53() != 55)
     {
+        errnum = errnum + 1;
         printf("test53() faild (actual:%d expect:%d)\n", test53(), 55);
     }
     if (test54() != 55)
     {
+        errnum = errnum + 1;
         printf("test54() faild (actual:%d expect:%d)\n", test54(), 55);
     }
     if (test55() != 0)
     {
+        errnum = errnum + 1;
         printf("test55() faild (actual:%d expect:%d)\n", test55(), 0);
     }
     if (test56() != 50)
     {
+        errnum = errnum + 1;
         printf("test56() faild (actual:%d expect:%d)\n", test56(), 50);
     }
     if (test57() != 0)
     {
+        errnum = errnum + 1;
         printf("test57() faild (actual:%d expect:%d)\n", test57(), 0);
     }
     if (test58() != 111)
     {
+        errnum = errnum + 1;
         printf("test58() faild (actual:%d expect:%d)\n", test58(), 111);
     }
     if (test59() != 42)
     {
+        errnum = errnum + 1;
         printf("test59() faild (actual:%d expect:%d)\n", test59(), 42);
     }
     if (test60() != 21)
     {
+        errnum = errnum + 1;
         printf("test60() faild (actual:%d expect:%d)\n", test60(), 21);
     }
     if (test61() != 9)
     {
+        errnum = errnum + 1;
         printf("test61() faild (actual:%d expect:%d)\n", test61(), 9);
     }
     if (test62() != 10)
     {
+        errnum = errnum + 1;
         printf("test62() faild (actual:%d expect:%d)\n", test62(), 10);
     }
     if (test63() != 0)
     {
+        errnum = errnum + 1;
         printf("test63() faild (actual:%d expect:%d)\n", test63(), 0);
     }
     if (test64() != 42)
     {
+        errnum = errnum + 1;
         printf("test64() faild (actual:%d expect:%d)\n", test64(), 42);
     }
     if (test65() != 42)
     {
+        errnum = errnum + 1;
         printf("test65() faild (actual:%d expect:%d)\n", test65(), 42);
     }
     if (test66() != 3)
     {
+        errnum = errnum + 1;
         printf("test66() faild (actual:%d expect:%d)\n", test66(), 3);
     }
     if (test67() != 42)
     {
+        errnum = errnum + 1;
         printf("test67() faild (actual:%d expect:%d)\n", test67(), 42);
     }
     if (test68() != 8)
     {
+        errnum = errnum + 1;
         printf("test68() faild (actual:%d expect:%d)\n", test68(), 8);
     }
     if (test69() != 4)
     {
+        errnum = errnum + 1;
         printf("test69() faild (actual:%d expect:%d)\n", test69(), 4);
     }
     if (test70() != 4)
     {
+        errnum = errnum + 1;
         printf("test70() faild (actual:%d expect:%d)\n", test70(), 4);
     }
     if (test71() != 8)
     {
+        errnum = errnum + 1;
         printf("test71() faild (actual:%d expect:%d)\n", test71(), 8);
     }
     if (test72() != 4)
     {
+        errnum = errnum + 1;
         printf("test72() faild (actual:%d expect:%d)\n", test72(), 4);
     }
     if (test73() != 2)
     {
+        errnum = errnum + 1;
         printf("test73() faild (actual:%d expect:%d)\n", test73(), 2);
     }
     if (test74() != 2)
     {
+        errnum = errnum + 1;
         printf("test74() faild (actual:%d expect:%d)\n", test74(), 2);
     }
     if (test75() != 34)
     {
+        errnum = errnum + 1;
         printf("test75() faild (actual:%d expect:%d)\n", test75(), 34);
     }
     if (test76() != 42)
     {
+        errnum = errnum + 1;
         printf("test76() faild (actual:%d expect:%d)\n", test76(), 42);
     }
     if (test77() != 3)
     {
+        errnum = errnum + 1;
         printf("test77() faild (actual:%d expect:%d)\n", test77(), 3);
     }
     if (test78() != 34)
     {
+        errnum = errnum + 1;
         printf("test78() faild (actual:%d expect:%d)\n", test78(), 34);
     }
     if (test79() != 13)
     {
+        errnum = errnum + 1;
         printf("test79() faild (actual:%d expect:%d)\n", test79(), 13);
     }
     if (test80() != 2)
     {
+        errnum = errnum + 1;
         printf("test80() faild (actual:%d expect:%d)\n", test80(), 2);
     }
     if (test81() != 25)
     {
+        errnum = errnum + 1;
         printf("test81() faild (actual:%d expect:%d)\n", test81(), 25);
     }
     if (test82() != 21)
     {
+        errnum = errnum + 1;
         printf("test82() faild (actual:%d expect:%d)\n", test82(), 21);
     }
     if (test83() != 1)
     {
+        errnum = errnum + 1;
         printf("test83() faild (actual:%d expect:%d)\n", test83(), 1);
     }
     if (test84() != 32)
     {
+        errnum = errnum + 1;
         printf("test84() faild (actual:%d expect:%d)\n", test84(), 32);
     }
     if (test85() != 4)
     {
+        errnum = errnum + 1;
         printf("test85() faild (actual:%d expect:%d)\n", test85(), 4);
     }
     if (test86() != 8)
     {
+        errnum = errnum + 1;
         printf("test86() faild (actual:%d expect:%d)\n", test86(), 8);
     }
     if (test87() != 4)
     {
+        errnum = errnum + 1;
         printf("test87() faild (actual:%d expect:%d)\n", test87(), 4);
     }
     if (test88() != 2)
     {
+        errnum = errnum + 1;
         printf("test88() faild (actual:%d expect:%d)\n", test88(), 2);
     }
     if (test89() != 34)
     {
+        errnum = errnum + 1;
         printf("test89() faild (actual:%d expect:%d)\n", test89(), 34);
     }
     if (test90() != 42)
     {
+        errnum = errnum + 1;
         printf("test90() faild (actual:%d expect:%d)\n", test90(), 42);
     }
     if (test91() != 3)
     {
+        errnum = errnum + 1;
         printf("test91() faild (actual:%d expect:%d)\n", test91(), 3);
     }
     if (test92() != 34)
     {
+        errnum = errnum + 1;
         printf("test92() faild (actual:%d expect:%d)\n", test92(), 34);
     }
     if (test93() != 13)
     {
+        errnum = errnum + 1;
         printf("test93() faild (actual:%d expect:%d)\n", test93(), 13);
     }
     if (test94() != 42)
     {
+        errnum = errnum + 1;
         printf("test94() faild (actual:%d expect:%d)\n", test94(), 42);
     }
     if (test95() != 32)
     {
+        errnum = errnum + 1;
         printf("test95() faild (actual:%d expect:%d)\n", test95(), 32);
     }
     if (test96() != 32)
     {
+        errnum = errnum + 1;
         printf("test96() faild (actual:%d expect:%d)\n", test96(), 32);
     }
     if (test97() != 3)
     {
+        errnum = errnum + 1;
         printf("test97() faild (actual:%d expect:%d)\n", test97(), 3);
     }
     if (test98() != 32)
     {
+        errnum = errnum + 1;
         printf("test98() faild (actual:%d expect:%d)\n", test98(), 32);
     }
     if (test99() != 32)
     {
+        errnum = errnum + 1;
         printf("test99() faild (actual:%d expect:%d)\n", test99(), 32);
     }
     if (test100() != 97)
     {
+        errnum = errnum + 1;
         printf("test100() faild (actual:%d expect:%d)\n", test100(), 97);
     }
     if (test101() != 42)
     {
+        errnum = errnum + 1;
         printf("test101() faild (actual:%d expect:%d)\n", test101(), 42);
     }
     if (test102() != 32)
     {
+        errnum = errnum + 1;
         printf("test102() faild (actual:%d expect:%d)\n", test102(), 32);
     }
     if (test103() != 103)
     {
+        errnum = errnum + 1;
         printf("test103() faild (actual:%d expect:%d)\n", test103(), 103);
     }
     if (test104() != 5)
     {
+        errnum = errnum + 1;
         printf("test104() faild (actual:%d expect:%d)\n", test104(), 5);
     }
     if (test105() != 14)
     {
+        errnum = errnum + 1;
         printf("test105() faild (actual:%d expect:%d)\n", test105(), 14);
     }
+    if (errnum == 0)
+    {
+        printf("test passed!\n");
+    }
+    else
+    {
+        printf("test faild with %d error(s)!\n", errnum);
+    }
+
     return 0;
 }
