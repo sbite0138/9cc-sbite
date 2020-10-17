@@ -3,7 +3,9 @@ int main()
 {
     struct {
         int x;
+        int y;
+        char z;
     } foo;
-    foo.x = 32;
+    printf("%d\n", sizeof(foo));
     return 0;
 }

@@ -88,6 +88,7 @@ struct Member {
     Member* next;
     Type* ty;
     char* name;
+    int len;
     int offset;
 };
 

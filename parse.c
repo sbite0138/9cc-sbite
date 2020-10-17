@@ -352,13 +352,32 @@ void program()
 Type* decl_type()
 {
     int base_type = token->kind;
+    next_token();
+    Type* type = calloc(1, sizeof(Type));
 
-    if (token->kind == TK_STRUCT) {
+    if (base_type == TK_STRUCT) {
+        type->ty = STRUCT;
+        consume("{");
+        type->menbers = calloc(1, sizeof(Member));
+        Member* cur = type->menbers;
+        while (true) {
+
+            cur->ty = decl_type();
+            cur->name = token->str;
+            cur->len = token->len;
+            next_token();
+            consume(";");
+            if (consume("}"))
+                break;
+            Member* next = calloc(1, sizeof(Member));
+            cur->next = next;
+            cur = next;
+        }
+        return type;
     } else {
-        // int型でいいのか…？
-        next_token();
-        Type* type = calloc(1, sizeof(Type));
+
         Type* cur = type;
+        // int型でいいのか…？
         while (consume("*")) {
             cur->ty = PTR;
             Type* next = calloc(1, sizeof(Type));

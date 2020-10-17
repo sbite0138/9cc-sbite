@@ -151,5 +151,15 @@ int type_size(Type* type)
     if (type->ty == ARRAY) {
         return type->array_size * type_size(type->ptr_to);
     }
+    if (type->ty == STRUCT) {
+        int ret = 0;
+        Member* cur = type->menbers;
+        while (cur != NULL) {
+            ret += type_size(cur->ty);
+            cur = cur->next;
+        }
+        return ret;
+    }
+
     error("不明なタイプです:%d", type->ty);
 }
