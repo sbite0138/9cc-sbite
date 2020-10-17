@@ -3,5 +3,6 @@
 *.s
 *.dot
 *.png
+.vscode
 tmp*
 9cc

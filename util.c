@@ -1,9 +1,8 @@
-#include <errno.h>
 #include "9cc.h"
-void node_name(NodeKind kind, char *s)
+#include <errno.h>
+void node_name(NodeKind kind, char* s)
 {
-    switch (kind)
-    {
+    switch (kind) {
     case ND_ADD:
         strcpy(s, "ADD");
         break;
@@ -76,34 +75,28 @@ void node_name(NodeKind kind, char *s)
     }
 }
 
-void dumpAST(FILE *fp, Node *node)
+void dumpAST(FILE* fp, Node* node)
 {
 
-    char *strparent = (char *)calloc(128, sizeof(char));
-    char *strchild = (char *)calloc(128, sizeof(char));
+    char* strparent = (char*)calloc(128, sizeof(char));
+    char* strchild = (char*)calloc(128, sizeof(char));
     node_name(node->kind, strparent);
-    if (node->kind == ND_BLOCK)
-    {
-        Block *cur = node->block;
-        while (cur != NULL)
-        {
+    if (node->kind == ND_BLOCK) {
+        Block* cur = node->block;
+        while (cur != NULL) {
             node_name(cur->stmt_node->kind, strchild);
             fprintf(fp, "\"%s@%p\" -> \"%s@%p\";\n", strparent, node, strchild, cur->stmt_node);
             dumpAST(fp, cur->stmt_node);
             cur = cur->next;
         }
-    }
-    else
-    {
-        if (node->lhs != NULL)
-        {
+    } else {
+        if (node->lhs != NULL) {
             node_name(node->lhs->kind, strchild);
             fprintf(fp, "\"%s@%p\" -> \"%s@%p\";\n", strparent, node, strchild, node->lhs);
             dumpAST(fp, node->lhs);
         }
 
-        if (node->rhs != NULL)
-        {
+        if (node->rhs != NULL) {
             node_name(node->rhs->kind, strchild);
             fprintf(fp, "\"%s@%p\" -> \"%s@%p\";\n", strparent, node, strchild, node->rhs);
             dumpAST(fp, node->rhs);
@@ -111,25 +104,23 @@ void dumpAST(FILE *fp, Node *node)
     }
 }
 
-int get_array_offset(Type *type)
+int get_array_offset(Type* type)
 {
-    if (type->ty != ARRAY)
-    {
-        error("call get_array_offset with not ARRAY type\n");
+    if (type->ty != ARRAY) {
+        error("call get_array_offset with non ARRAY type\n");
     }
     int offset = 1;
-    Type *cur = type;
-    while (cur->ty == ARRAY)
-    {
+    Type* cur = type;
+    while (cur->ty == ARRAY) {
         offset *= cur->array_size;
         cur = cur->ptr_to;
     }
     return offset;
 }
 
-char *read_file(char *path)
+char* read_file(char* path)
 {
-    FILE *fp = fopen(path, "r");
+    FILE* fp = fopen(path, "r");
     if (!fp)
         error("cannot open %s: %s", path, strerror(errno));
     if (fseek(fp, 0, SEEK_END) == -1)
@@ -137,7 +128,7 @@ char *read_file(char *path)
     size_t size = ftell(fp);
     if (fseek(fp, 0, SEEK_SET) == -1)
         error("%s: fseek: %s", path, strerror(errno));
-    char *buf = calloc(1, size + 2);
+    char* buf = calloc(1, size + 2);
     fread(buf, size, 1, fp);
     if (size == 0 || buf[size - 1] != '\n')
         buf[size++] = '\n';
@@ -146,22 +137,18 @@ char *read_file(char *path)
     return buf;
 }
 
-int type_size(Type *type)
+int type_size(Type* type)
 {
-    if (type->ty == CHAR)
-    {
+    if (type->ty == CHAR) {
         return 1;
     }
-    if (type->ty == INT)
-    {
+    if (type->ty == INT) {
         return 4;
     }
-    if (type->ty == PTR)
-    {
+    if (type->ty == PTR) {
         return 8;
     }
-    if (type->ty == ARRAY)
-    {
+    if (type->ty == ARRAY) {
         return type->array_size * type_size(type->ptr_to);
     }
     error("不明なタイプです:%d", type->ty);

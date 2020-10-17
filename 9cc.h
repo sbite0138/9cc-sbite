@@ -1,15 +1,14 @@
 #ifndef __9CC_H__
 #define __9CC_H__
-#include <stdio.h>
-#include <stdlib.h>
+#include <assert.h>
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <assert.h>
 
-typedef enum
-{
+typedef enum {
     TK_RESERVED,
     TK_IDENT,
     TK_NUM,
@@ -22,22 +21,22 @@ typedef enum
     TK_INT,
     TK_STR,
     TK_CHAR,
+    TK_STRUCT,
+    TK_DOT,
     TK_EOF
 } TokenKind;
 
 typedef struct Token Token;
 
-struct Token
-{
+struct Token {
     TokenKind kind;
-    Token *next;
+    Token* next;
     int val;
-    char *str;
+    char* str;
     int len;
 };
 
-typedef enum
-{
+typedef enum {
     ND_ADD,
     ND_SUB,
     ND_MUL,
@@ -70,110 +69,114 @@ typedef struct LVar LVar;
 typedef struct Str Str;
 typedef struct Arg Arg;
 typedef struct Type Type;
-struct Type
-{
-    enum
-    {
+typedef struct Member Member;
+
+struct Type {
+    enum {
         INT,
         CHAR,
         PTR,
-        ARRAY
+        ARRAY,
+        STRUCT
     } ty;
-    Type *ptr_to;
+    Type* ptr_to;
+    Member* menbers;
     int array_size; //tyがARRAYだった場合、その要素数 例えばint a[2][3][4]のとき、a[0]は3,a[0][0]は4
 };
 
-struct Node
-{
-    NodeKind kind;
-    Node *lhs;
-    Node *rhs;
-    Block *block;
-    int val;         //kindがND_NUMの場合のみ使う
-    int offset;      //kindがND_LVARの場合のみ使う
-    char *gvarname;  //kindがND_GVALの場合のみ使う
-    int gvarnamelen; //kindがND_GVALの場合のみ使う
-    char *funcname;  //kindがND_CALLまたはND_FUNCの場合のみ使う
-    int funcnamelen; //kindがND_CALLまたはND_FUNCの場合のみ使う
-    Arg *args;       //kindがND_CALLの場合のみ使う
-    int argnum;      //kindがND_FUNCの場合のみ使う
-    Type *type;      //kindがND_ADDまたはND_SUBのとき、その演算が何に対して行われるのか表す
-    Str *str;        //kindがND_STRの場合のみ使う
-};
-struct Block
-{
-    Node *stmt_node;
-    Block *next;
+struct Member {
+    Member* next;
+    Type* ty;
+    char* name;
+    int offset;
 };
 
-struct LVar
-{
-    LVar *next;
-    char *name;
+struct Node {
+    NodeKind kind;
+    Node* lhs;
+    Node* rhs;
+    Block* block;
+    int val; //kindがND_NUMの場合のみ使う
+    int offset; //kindがND_LVARの場合のみ使う
+    char* gvarname; //kindがND_GVALの場合のみ使う
+    int gvarnamelen; //kindがND_GVALの場合のみ使う
+    char* funcname; //kindがND_CALLまたはND_FUNCの場合のみ使う
+    int funcnamelen; //kindがND_CALLまたはND_FUNCの場合のみ使う
+    Arg* args; //kindがND_CALLの場合のみ使う
+    int argnum; //kindがND_FUNCの場合のみ使う
+    Type* type; //kindがND_ADDまたはND_SUBのとき、その演算が何に対して行われるのか表す
+    Str* str; //kindがND_STRの場合のみ使う
+};
+struct Block {
+    Node* stmt_node;
+    Block* next;
+};
+
+struct LVar {
+    LVar* next;
+    char* name;
     int len;
     int offset;
     int size;
-    Type *type;
+    Type* type;
 };
 
-struct Str
-{
-    Str *next;
-    char *str;
+struct Str {
+    Str* next;
+    char* str;
     int len;
     int id;
 };
 
-struct Arg
-{
-    Node *node;
-    Arg *next;
+struct Arg {
+    Node* node;
+    Arg* next;
 };
 
-void error(char *fmt, ...);
+void error(char* fmt, ...);
 
 void program();
-Node *toplevel();
-Node *stmt();
-Node *expr();
-Node *assign();
-Node *equality();
-Node *relational();
-Node *add();
-Node *mul();
-Node *unary();
-Node *term();
-void gen(Node *node);
-Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
-Token *tokenize(char *p);
-Node *expr();
+Node* toplevel();
+Node* stmt();
+Node* expr();
+Node* assign();
+Node* equality();
+Node* relational();
+Node* add();
+Node* mul();
+Node* unary();
+Node* term();
+void gen(Node* node);
+Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
+Token* tokenize(char* p);
+Node* expr();
 
 void gen_globals();
 void gen_strings();
-void gen_gval(Node *node);
+void gen_gval(Node* node);
 
-LVar *find_lvar(Token *tok, LVar *root);
-Block *new_block(Block *cur);
-Block *next_block(Block *block);
-Arg *new_arg(Arg *cur);
-Arg *next_arg(Arg *cur);
-void print_type(Type *type);
+LVar* find_lvar(Token* tok, LVar* root);
+Block* new_block(Block* cur);
+Block* next_block(Block* block);
+Arg* new_arg(Arg* cur);
+Arg* next_arg(Arg* cur);
+void print_type(Type* type);
 
-int type_size(Type *type);
-int get_array_offset(Type *type);
-char *read_file(char *path);
+int type_size(Type* type);
+int get_array_offset(Type* type);
+char* read_file(char* path);
 
-void node_name(NodeKind kind, char *s);
-void dumpAST(FILE *fp, Node *node);
-extern Token *token;
-extern char *user_input;
-extern Node *code[1024];
-extern LVar *func_variables[256];
-extern LVar *locals;
-extern LVar *globals;
-extern Str *strings;
+void node_name(NodeKind kind, char* s);
+void dumpAST(FILE* fp, Node* node);
+extern Token* token;
+extern char* user_input;
+extern Node* code[1024];
+extern LVar* func_variables[256];
+extern LVar* locals;
+extern LVar* globals;
+extern Str* strings;
 
 extern int label;
-extern char **arg_reg_32;
-extern char **arg_reg_64;
+extern char** arg_reg_32;
+extern char** arg_reg_64;
 #endif

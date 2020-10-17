@@ -1,6 +1,6 @@
 #include "9cc.h"
 
-int calloc4(int **x, int a, int b, int c, int d)
+int calloc4(int** x, int a, int b, int c, int d)
 {
     *x = calloc(4, sizeof(int));
     *(*x + 0) = a;
@@ -9,7 +9,7 @@ int calloc4(int **x, int a, int b, int c, int d)
     *(*x + 3) = d;
     return 0;
 }
-int calloc1(int *x)
+int calloc1(int* x)
 {
     //*x = calloc(1, sizeof(int));
     printf("%d\n", *x);
