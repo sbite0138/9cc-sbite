@@ -1,4 +1,5 @@
 #include "9cc.h"
+
 Token* token;
 char* user_input;
 Node* code[1024];
@@ -230,12 +231,10 @@ tokenize(char* p)
             cur = new_token(TK_RESERVED, cur, p, 2);
             p += 2;
             continue;
-        } else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',' || *p == '&' || *p == '[' || *p == ']') {
+        } else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '.' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',' || *p == '&' || *p == '[' || *p == ']') {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
-        }
-
-        else if ((strncmp(p, "if", 2) == 0) && !is_alnum(p[2])) {
+        } else if ((strncmp(p, "if", 2) == 0) && !is_alnum(p[2])) {
             cur = new_token(TK_IF, cur, p, 2);
             p += 2;
             continue;
@@ -358,13 +357,16 @@ Type* decl_type()
     if (base_type == TK_STRUCT) {
         type->ty = STRUCT;
         consume("{");
-        type->menbers = calloc(1, sizeof(Member));
-        Member* cur = type->menbers;
+        type->members = calloc(1, sizeof(Member));
+        Member* cur = type->members;
+        int offset = 0;
         while (true) {
 
             cur->ty = decl_type();
             cur->name = token->str;
             cur->len = token->len;
+            cur->offset = offset;
+            offset += type_size(cur->ty);
             next_token();
             consume(";");
             if (consume("}"))
@@ -778,6 +780,7 @@ Node* term()
             }
             if (lvar) {
                 if (lvar->type->ty == ARRAY) {
+                    // lvarが配列
                     if (consume("[")) {
                         node->kind = ND_DEREF;
                         Node* node_lvar = calloc(1, sizeof(Node));
@@ -828,6 +831,21 @@ Node* term()
                         node->type = calloc(1, sizeof(Type));
                         node->type->ty = PTR;
                         node->type->ptr_to = lvar->type->ptr_to;
+                    }
+                } else if (lvar->type->ty == STRUCT) {
+                    if (consume(".")) {
+                        Member* member = find_member(lvar->type->members, token->str);
+                        node->offset = lvar->offset + member->offset;
+                        node->type = member->ty;
+                        // fprintf(stderr, "%p\n", member->ty);
+                        next_token(token);
+                    } else {
+                        node->offset = lvar->offset;
+                        node->type = lvar->type;
+                        if (var_type == ND_GVAR) {
+                            node->gvarname = lvar->name;
+                            node->gvarnamelen = lvar->len;
+                        }
                     }
                 } else {
                     if (consume("[") && lvar->type->ty == PTR) {

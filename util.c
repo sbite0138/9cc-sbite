@@ -153,7 +153,7 @@ int type_size(Type* type)
     }
     if (type->ty == STRUCT) {
         int ret = 0;
-        Member* cur = type->menbers;
+        Member* cur = type->members;
         while (cur != NULL) {
             ret += type_size(cur->ty);
             cur = cur->next;

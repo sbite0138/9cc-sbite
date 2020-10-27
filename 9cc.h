@@ -80,7 +80,7 @@ struct Type {
         STRUCT
     } ty;
     Type* ptr_to;
-    Member* menbers;
+    Member* members;
     int array_size; //tyがARRAYだった場合、その要素数 例えばint a[2][3][4]のとき、a[0]は3,a[0][0]は4
 };
 
@@ -157,6 +157,7 @@ void gen_strings();
 void gen_gval(Node* node);
 
 LVar* find_lvar(Token* tok, LVar* root);
+Member* find_member(Member* head, char* name);
 Block* new_block(Block* cur);
 Block* next_block(Block* block);
 Arg* new_arg(Arg* cur);

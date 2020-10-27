@@ -15,6 +15,19 @@ LVar* find_lvar(Token* tok, LVar* root)
     return NULL;
 }
 
+Member* find_member(Member* head, char* name)
+{
+    Member* cur = head;
+    while (cur != NULL) {
+        // fprintf(stderr, "%c %s %d\n", cur->name[0], name, cur->len);
+        if (strncmp(cur->name, name, cur->len) == 0) {
+            return cur;
+        }
+        cur = cur->next;
+    }
+    return NULL;
+}
+
 Block* new_block(Block* cur)
 {
     Block* new = calloc(1, sizeof(Block));
