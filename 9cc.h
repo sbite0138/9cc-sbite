@@ -65,9 +65,10 @@ typedef enum {
 
 typedef struct Node Node;
 typedef struct Block Block;
-typedef struct LVar LVar;
+typedef struct Variable Variable;
 typedef struct Str Str;
 typedef struct Arg Arg;
+typedef struct Tag Tag;
 typedef struct Type Type;
 typedef struct Member Member;
 
@@ -113,8 +114,17 @@ struct Block {
     Block* next;
 };
 
-struct LVar {
-    LVar* next;
+struct Variable {
+    Variable* next;
+    char* name;
+    int len;
+    int offset;
+    int size;
+    Type* type;
+};
+
+struct Tag {
+    Tag* next;
     char* name;
     int len;
     int offset;
@@ -156,7 +166,7 @@ void gen_globals();
 void gen_strings();
 void gen_gval(Node* node);
 
-LVar* find_lvar(Token* tok, LVar* root);
+Variable* find_variable(Token* tok, Variable* root);
 Member* find_member(Member* head, char* name);
 Block* new_block(Block* cur);
 Block* next_block(Block* block);
@@ -173,9 +183,9 @@ void dumpAST(FILE* fp, Node* node);
 extern Token* token;
 extern char* user_input;
 extern Node* code[1024];
-extern LVar* func_variables[256];
-extern LVar* locals;
-extern LVar* globals;
+extern Variable* func_variables[256];
+extern Variable* locals;
+extern Variable* globals;
 extern Str* strings;
 
 extern int label;

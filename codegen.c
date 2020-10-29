@@ -5,7 +5,7 @@ char** arg_reg_64;
 
 void gen_globals()
 {
-    LVar* var = globals;
+    Variable* var = globals;
     if (var == NULL)
         return;
     char* varname = calloc(128, sizeof(char));
@@ -79,7 +79,7 @@ void gen(Node* node)
     int current_label;
     Block* node_block = node->block;
     Arg* node_args = node->args;
-    LVar* cur = locals;
+    Variable* cur = locals;
     int argcnt = 0;
     char* name = calloc(128, sizeof(char));
 

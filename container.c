@@ -1,12 +1,12 @@
 #include "9cc.h"
 
-LVar* locals;
-LVar* globals;
+Variable* locals;
+Variable* globals;
 Str* strings;
 
-LVar* find_lvar(Token* tok, LVar* root)
+Variable* find_variable(Token* tok, Variable* root)
 {
-    LVar* var = root;
+    Variable* var = root;
     for (; var != NULL; var = var->next) {
         if (var->len == tok->len && !memcmp(tok->str, var->name, var->len)) {
             return var;
@@ -15,7 +15,14 @@ LVar* find_lvar(Token* tok, LVar* root)
     return NULL;
 }
 
-Member* find_member(Member* head, char* name)
+typedef struct Scope Scope;
+
+struct Scope {
+    Scope* next;
+};
+
+Member*
+find_member(Member* head, char* name)
 {
     Member* cur = head;
     while (cur != NULL) {

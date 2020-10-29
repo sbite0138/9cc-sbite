@@ -3,7 +3,7 @@
 Token* token;
 char* user_input;
 Node* code[1024];
-LVar* func_variables[256];
+Variable* func_variables[256];
 
 Node* new_node_num(int val)
 {
@@ -334,7 +334,7 @@ void program()
     globals = NULL;
     strings = NULL;
     while (!at_eof()) {
-        locals = calloc(1, sizeof(LVar));
+        locals = calloc(1, sizeof(Variable));
         locals->offset = 8;
         code[i] = toplevel();
         //トップレベルには関数かグローバル変数の定義が入る。
@@ -400,7 +400,7 @@ Type* decl_type()
 
 void decl_lvar()
 {
-    LVar* lvar = calloc(1, sizeof(LVar));
+    Variable* lvar = calloc(1, sizeof(Variable));
     Type* base = decl_type();
     Type* head = NULL;
     Type* cur = NULL;
@@ -465,7 +465,7 @@ Node* toplevel()
         Node* cur = node;
         if (!consume(")")) {
             for (;;) {
-                LVar* lvar = calloc(1, sizeof(LVar));
+                Variable* lvar = calloc(1, sizeof(Variable));
                 lvar->type = decl_type();
                 // print_type(lvar->type);
                 lvar->next = locals;
@@ -485,7 +485,7 @@ Node* toplevel()
         node->rhs = stmt();
         return node;
     } else {
-        LVar* lvar = calloc(1, sizeof(LVar));
+        Variable* lvar = calloc(1, sizeof(Variable));
         lvar->type = type;
         lvar->next = globals;
         lvar->name = name;
@@ -771,12 +771,12 @@ Node* term()
             int var_type;
             Node* node = calloc(1, sizeof(Node));
             node->kind = ND_LVAR;
-            LVar* lvar = find_lvar(tok, locals);
+            Variable* lvar = find_variable(tok, locals);
             var_type = ND_LVAR;
             if (lvar == NULL) {
                 node->kind = ND_GVAR;
                 var_type = ND_GVAR;
-                lvar = find_lvar(tok, globals);
+                lvar = find_variable(tok, globals);
             }
             if (lvar) {
                 if (lvar->type->ty == ARRAY) {
