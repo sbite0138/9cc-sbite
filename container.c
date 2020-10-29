@@ -15,12 +15,6 @@ Variable* find_variable(Token* tok, Variable* root)
     return NULL;
 }
 
-typedef struct Scope Scope;
-
-struct Scope {
-    Scope* next;
-};
-
 Member*
 find_member(Member* head, char* name)
 {
