@@ -356,24 +356,27 @@ Type* decl_type()
 
     if (base_type == TK_STRUCT) {
         type->ty = STRUCT;
-        consume("{");
-        type->members = calloc(1, sizeof(Member));
-        Member* cur = type->members;
-        int offset = 0;
-        while (true) {
+        if (consume("{")) {
+            //無名構造体
+            type->members = calloc(1, sizeof(Member));
+            Member* cur = type->members;
+            int offset = 0;
+            while (true) {
 
-            cur->ty = decl_type();
-            cur->name = token->str;
-            cur->len = token->len;
-            cur->offset = offset;
-            offset += type_size(cur->ty);
-            next_token();
-            consume(";");
-            if (consume("}"))
-                break;
-            Member* next = calloc(1, sizeof(Member));
-            cur->next = next;
-            cur = next;
+                cur->ty = decl_type();
+                cur->name = token->str;
+                cur->len = token->len;
+                cur->offset = offset;
+                offset += type_size(cur->ty);
+                next_token();
+                consume(";");
+                if (consume("}"))
+                    break;
+                Member* next = calloc(1, sizeof(Member));
+                cur->next = next;
+                cur = next;
+            }
+        } else {
         }
         return type;
     } else {
@@ -401,7 +404,11 @@ Type* decl_type()
 void decl_lvar()
 {
     Variable* lvar = calloc(1, sizeof(Variable));
+
     Type* base = decl_type();
+    if (consume(";")) {
+        return;
+    }
     Type* head = NULL;
     Type* cur = NULL;
     lvar->next = locals;
@@ -409,6 +416,7 @@ void decl_lvar()
     lvar->type = calloc(1, sizeof(Type));
     lvar->len = token->len;
     next_token();
+
     int size = 1;
     while (consume("[")) {
         // head->...->cur->base #=> head->...->cur->node->base にする

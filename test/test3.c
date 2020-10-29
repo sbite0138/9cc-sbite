@@ -1,7 +1,5 @@
-#include <stdio.h>
-
 int main()
 {
-    void* foo;
+    int;
     return 0;
 }

@@ -127,8 +127,6 @@ struct Tag {
     Tag* next;
     char* name;
     int len;
-    int offset;
-    int size;
     Type* type;
 };
 
