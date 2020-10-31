@@ -40,10 +40,10 @@ void gen_ptr(Node* node)
     //これはINT+PTRみたいな部分のアセンブルになっていて（多分）、CHARはここに入らないという前提をおきます（おくので）（PTR+CHARはgccでも警告が出ます）
     if (node->lhs->type == INT) {
         assert(node->rhs->type->ty == PTR);
-        printf("  imul rax,%d\n", type_size(node->rhs->type->ptr_to));
+        printf("  imul rax,%d\n", type_size(node->rhs->type->base));
     } else {
         assert(node->lhs->type->ty == PTR);
-        printf("  imul rdi,%d\n", type_size(node->lhs->type->ptr_to));
+        printf("  imul rdi,%d\n", type_size(node->lhs->type->base));
         //  fprintf(stderr, "%d\n", type_size(node->lhs->type));
     }
 }
@@ -146,11 +146,11 @@ void gen(Node* node)
         //fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
         //多分ここは*(a+INT)みたいな処理をアセンブルしていて、*(a+CHAR)みたいなのはgccでもWarnが出るので考えないことにします
         printf("#DEREF\n");
-        if (node->rhs->type->ptr_to->ty == INT) {
+        if (node->rhs->type->base->ty == INT) {
             printf("  mov eax, DWORD  PTR[rax]\n");
         }
         // charも必要ですね。それはそう
-        else if (node->rhs->type->ptr_to->ty == CHAR) {
+        else if (node->rhs->type->base->ty == CHAR) {
             printf("  movsx eax, BYTE  PTR[rax]\n");
         } else {
             printf("  mov rax, [rax]\n");

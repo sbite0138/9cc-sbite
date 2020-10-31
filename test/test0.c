@@ -663,6 +663,13 @@ int test105()
     return a105[3][3] + a105[9][2];
 }
 
+int test106()
+{
+    int a106[10][10];
+    a106[3][3] = 3;
+    a106[3][5] = 3;
+    return a106[3][a106[3][5]];
+}
 int main()
 {
     int errnum;
@@ -1090,6 +1097,10 @@ int main()
     if (test105() != 14) {
         errnum = errnum + 1;
         printf("test105() faild (actual:%d expect:%d)\n", test105(), 14);
+    }
+    if (test106() != 6) {
+        errnum = errnum + 1;
+        printf("test106() faild (actual:%d expect:%d)\n", test106(), 3);
     }
     if (errnum == 0) {
         printf("test passed!\n");

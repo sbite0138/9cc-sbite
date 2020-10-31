@@ -80,7 +80,7 @@ struct Type {
         ARRAY,
         STRUCT
     } ty;
-    Type* ptr_to;
+    Type* base;
     Member* members;
     int array_size; //tyがARRAYだった場合、その要素数 例えばint a[2][3][4]のとき、a[0]は3,a[0][0]は4
 };

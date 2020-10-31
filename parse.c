@@ -64,13 +64,13 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs)
                 // assert(rhs->type->ty == PTR);
 
                 fprintf(stderr, "%d\n", rhs->type->ty);
-                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->ptr_to)));
+                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
                 node->type = rhs->type;
             } else {
                 // assert(lhs->type->ty == PTR);
                 fprintf(stderr, "%d\n", rhs->type->ty);
 
-                node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->ptr_to)));
+                node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
                 node->type = lhs->type;
             }
             //  fprintf(stderr, "%d\n", node->type->ty == PTR);
@@ -91,11 +91,11 @@ void print_type(Type* type)
         return;
     case PTR:
         fprintf(stderr, "PTR->");
-        print_type(type->ptr_to);
+        print_type(type->base);
         return;
     case ARRAY:
         fprintf(stderr, "ARRAY[%d]->", type->array_size);
-        print_type(type->ptr_to);
+        print_type(type->base);
         return;
     }
 }
@@ -386,7 +386,7 @@ Type* decl_type()
         while (consume("*")) {
             cur->ty = PTR;
             Type* next = calloc(1, sizeof(Type));
-            cur->ptr_to = next;
+            cur->base = next;
             cur = next;
         }
         switch (base_type) {
@@ -425,12 +425,12 @@ void decl_lvar()
         node->ty = ARRAY;
         node->array_size = token->val;
 
-        node->ptr_to = base;
+        node->base = base;
         if (head == NULL) {
             head = node;
             cur = node;
         } else {
-            cur->ptr_to = node;
+            cur->base = node;
             cur = node;
         }
         size *= token->val;
@@ -502,7 +502,7 @@ Node* toplevel()
         if (consume("[")) {
             Type* next = calloc(1, sizeof(Type));
             next->ty = ARRAY;
-            next->ptr_to = lvar->type;
+            next->base = lvar->type;
             lvar->type = next;
 
             size = token->val;
@@ -721,7 +721,7 @@ Node* unary()
         node->rhs = unary();
         node->type = calloc(1, sizeof(Type));
         node->type->ty = PTR;
-        node->type->ptr_to = node->rhs->type;
+        node->type->base = node->rhs->type;
         return node;
     }
 
@@ -730,7 +730,7 @@ Node* unary()
         node->kind = ND_DEREF;
         node->rhs = unary();
         // node->type = calloc(1, sizeof(Type));
-        node->type = node->rhs->type->ptr_to;
+        node->type = node->rhs->type->base;
         return node;
     }
     if (consume_tokenkind(TK_SIZEOF)) {
@@ -796,7 +796,7 @@ Node* term()
                         node_lvar->offset = lvar->offset;
                         node_lvar->type = calloc(1, sizeof(Type));
                         node_lvar->type->ty = PTR;
-                        node_lvar->type->ptr_to = lvar->type->ptr_to;
+                        node_lvar->type->base = lvar->type->base;
                         if (var_type == ND_GVAR) {
                             node_lvar->gvarname = lvar->name;
                             node_lvar->gvarnamelen = lvar->len;
@@ -807,17 +807,17 @@ Node* term()
                         node_addr->rhs = node_lvar;
                         node_addr->type = calloc(1, sizeof(Type));
                         node_addr->type->ty = ARRAY;
-                        node_addr->type->ptr_to = node_lvar->type->ptr_to;
+                        node_addr->type->base = node_lvar->type->base;
                         node->rhs = node_addr;
                         node->type = node->rhs->type;
                         Type* cur = lvar->type;
                         do {
                             Node* node_index = add();
                             Node* mul_node = new_node(
-                                ND_MUL, node_index, new_node_num(type_size(cur->ptr_to)));
-                            cur = cur->ptr_to;
+                                ND_MUL, node_index, new_node_num(type_size(cur->base)));
+                            cur = cur->base;
                             node->rhs = new_node(ND_ADD, node->rhs, mul_node);
-                            node->type = node->type->ptr_to;
+                            node->type = node->type->base;
                             expect("]");
                         } while (consume("["));
                         // node->type = calloc(1, sizeof(Type));
@@ -838,7 +838,7 @@ Node* term()
                         node->rhs = node_lvar;
                         node->type = calloc(1, sizeof(Type));
                         node->type->ty = PTR;
-                        node->type->ptr_to = lvar->type->ptr_to;
+                        node->type->base = lvar->type->base;
                     }
                 } else if (lvar->type->ty == STRUCT) {
                     if (consume(".")) {
@@ -863,14 +863,14 @@ Node* term()
                         node_lvar->offset = lvar->offset;
                         node_lvar->type = calloc(1, sizeof(Type));
                         node_lvar->type->ty = PTR;
-                        node_lvar->type->ptr_to = lvar->type->ptr_to;
+                        node_lvar->type->base = lvar->type->base;
                         if (var_type == ND_GVAR) {
                             node_lvar->gvarname = lvar->name;
                             node_lvar->gvarnamelen = lvar->len;
                         }
                         Node* node_index = add();
                         node->rhs = new_node(ND_ADD, node_lvar, node_index);
-                        node->type = node->rhs->type->ptr_to;
+                        node->type = node->rhs->type->base;
                         expect("]");
                     } else {
                         node->offset = lvar->offset;

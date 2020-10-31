@@ -113,7 +113,7 @@ int get_array_offset(Type* type)
     Type* cur = type;
     while (cur->ty == ARRAY) {
         offset *= cur->array_size;
-        cur = cur->ptr_to;
+        cur = cur->base;
     }
     return offset;
 }
@@ -149,7 +149,7 @@ int type_size(Type* type)
         return 8;
     }
     if (type->ty == ARRAY) {
-        return type->array_size * type_size(type->ptr_to);
+        return type->array_size * type_size(type->base);
     }
     if (type->ty == STRUCT) {
         int ret = 0;
