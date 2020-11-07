@@ -72,6 +72,9 @@ void node_name(NodeKind kind, char* s)
     case ND_WHILE:
         strcpy(s, "NEQ");
         break;
+    case ND_NOP:
+        strcpy(s, "NOP");
+        break;
     }
 }
 
@@ -162,4 +165,15 @@ int type_size(Type* type)
     }
 
     error("不明なタイプです:%d", type->ty);
+}
+
+int get_array_dimesion(Type* type)
+{
+    int ret = 0;
+    Type* cur = type;
+    while (cur->ty == ARRAY) {
+        ret++;
+        cur = cur->base;
+    }
+    return ret;
 }

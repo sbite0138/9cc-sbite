@@ -61,6 +61,7 @@ typedef enum {
     ND_FOR,
     ND_BLOCK,
     ND_RETURN,
+    ND_NOP,
 } NodeKind;
 
 typedef struct Node Node;
@@ -78,7 +79,8 @@ struct Type {
         CHAR,
         PTR,
         ARRAY,
-        STRUCT
+        STRUCT,
+        VOID,
     } ty;
     Type* base;
     Member* members;
@@ -106,7 +108,7 @@ struct Node {
     int funcnamelen; //kindがND_CALLまたはND_FUNCの場合のみ使う
     Arg* args; //kindがND_CALLの場合のみ使う
     int argnum; //kindがND_FUNCの場合のみ使う
-    Type* type; //kindがND_ADDまたはND_SUBのとき、その演算が何に対して行われるのか表す
+    Type* type; //そのノードを処理した結果の型を持つ
     Str* str; //kindがND_STRの場合のみ使う
 };
 struct Block {
@@ -175,6 +177,7 @@ void print_type(Type* type);
 int type_size(Type* type);
 int get_array_offset(Type* type);
 char* read_file(char* path);
+int get_array_dimesion(Type* type);
 
 void node_name(NodeKind kind, char* s);
 void dumpAST(FILE* fp, Node* node);

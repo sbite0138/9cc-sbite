@@ -159,6 +159,11 @@ void gen(Node* node)
 
         printf("  push rax\n");
         return;
+    case ND_NOP:
+        gen(node->rhs);
+        //deref_nest--;
+        // printf("  pop rax\n");
+        return;
     case ND_LVAR:
         gen_lval(node);
         printf("  pop rax\n");

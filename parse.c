@@ -34,7 +34,7 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs)
         else if (lhs->type->ty == INT && rhs->type->ty == INT) {
             node->type->ty = INT;
         }
-        // char+char=int (ほんとうです
+        // char+char=int （本当です）
         // https://wandbox.org/permlink/PtkWNhW6gY0Qz3RB)
         else if (lhs->type->ty == CHAR && rhs->type->ty == CHAR) {
             node->type->ty = INT;
@@ -43,31 +43,35 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs)
         else if ((lhs->type->ty == CHAR && rhs->type->ty == INT) || (lhs->type->ty == INT && rhs->type->ty == CHAR)) {
             node->type->ty = INT;
         }
-        // array+int=array
+        // array+int=PTR
         else if ((lhs->type->ty == ARRAY && rhs->type->ty == INT) || (lhs->type->ty == INT && rhs->type->ty == ARRAY)) {
             if (lhs->type->ty == ARRAY) {
-                node->type = lhs->type;
+                node->type->ty = PTR;
+                node->type->base = lhs->type->base;
             } else {
-                node->type = rhs->type;
+                node->type->ty = PTR;
+                node->type->base = rhs->type->base;
             }
         }
         // array+char=array (あるのか？)
         else if ((lhs->type->ty == ARRAY && rhs->type->ty == CHAR) || (lhs->type->ty == CHAR && rhs->type->ty == ARRAY)) {
             if (lhs->type->ty == ARRAY) {
-                node->type = lhs->type;
+                node->type->ty = PTR;
+                node->type->base = lhs->type->base;
             } else {
-                node->type = rhs->type;
+                node->type->ty = PTR;
+                node->type->base = rhs->type->base;
             }
         } else {
             // PTR+INTみたいな式のこと…？
             if (lhs->type->ty == INT) {
-                // assert(rhs->type->ty == PTR);
+                assert(rhs->type->ty == PTR);
 
                 fprintf(stderr, "%d\n", rhs->type->ty);
                 node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
                 node->type = rhs->type;
             } else {
-                // assert(lhs->type->ty == PTR);
+                assert(lhs->type->ty == PTR);
                 fprintf(stderr, "%d\n", rhs->type->ty);
 
                 node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
@@ -790,7 +794,13 @@ Node* term()
                 if (lvar->type->ty == ARRAY) {
                     // lvarが配列
                     if (consume("[")) {
+                        // lvar[0]みたいな部分はDEREFをする場合とそうでない場合があって，
+                        // lvarばN次元配列の時，lvar[][][]...[] (K個)の時，K!=NならDEREFは行わない
+                        int dimesion = get_array_dimesion(lvar->type);
+
+                        //ND_NONEみたいなのを定義して，dimesionの結果に応じてkindを変更するのが良さそう...？
                         node->kind = ND_DEREF;
+
                         Node* node_lvar = calloc(1, sizeof(Node));
                         node_lvar->kind = var_type;
                         node_lvar->offset = lvar->offset;
@@ -818,8 +828,13 @@ Node* term()
                             cur = cur->base;
                             node->rhs = new_node(ND_ADD, node->rhs, mul_node);
                             node->type = node->type->base;
+                            dimesion--;
                             expect("]");
                         } while (consume("["));
+                        fprintf(stderr, "rest dim -> %d\n", dimesion);
+                        if (dimesion > 0) {
+                            node->kind = ND_NOP;
+                        }
                         // node->type = calloc(1, sizeof(Type));
 
                         // print_type(node->type);
