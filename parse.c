@@ -220,13 +220,11 @@ Type* decl_type()
                 cur->next = next;
                 cur = next;
             }
-        } else {
         }
         return type;
     } else {
 
         Type* cur = type;
-        // int型でいいのか…？
         while (consume("*")) {
             cur->ty = PTR;
             Type* next = calloc(1, sizeof(Type));
@@ -341,13 +339,13 @@ Node* toplevel()
         lvar->name = name;
         lvar->len = len;
         int size = 1;
-        if (consume("[")) {
+        while (consume("[")) {
             Type* next = calloc(1, sizeof(Type));
             next->ty = ARRAY;
             next->base = lvar->type;
             lvar->type = next;
-
-            size = token->val;
+            size *= token->val;
+            next->array_size = size;
             next_token();
             expect("]");
         }
