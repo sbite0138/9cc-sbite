@@ -345,13 +345,14 @@ Node* toplevel()
             next->base = lvar->type;
             lvar->type = next;
             size *= token->val;
-            next->array_size = size;
+            next->array_size = token->val;
             next_token();
             expect("]");
         }
         if (lvar->type->ty == INT) {
             lvar->size = 4 * size;
         } else {
+            // TODO: 他の型(structとか)も扱えるようにする
             lvar->size = 8 * size;
         }
         globals = lvar;
