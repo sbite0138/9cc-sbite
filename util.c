@@ -118,7 +118,6 @@ void dumpAST(FILE* fp, Node* node)
         Block* cur = node->block;
         while (cur != NULL) {
             node_name(cur->stmt_node->kind, strchild);
-            fprintf(fp, "\"%s@%p\" -> \"%s@%p\";\n", strparent, node, strchild, cur->stmt_node);
             dumpAST(fp, cur->stmt_node);
             cur = cur->next;
         }

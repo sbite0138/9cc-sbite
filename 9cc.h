@@ -168,7 +168,7 @@ void gen_gval(Node* node);
 
 Variable* find_variable(Token* tok, Variable* root);
 Member* find_member(Member* head, char* name);
-Block* new_block(Block* cur);
+Block* new_block();
 Block* next_block(Block* block);
 Arg* new_arg(Arg* cur);
 Arg* next_arg(Arg* cur);

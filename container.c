@@ -40,10 +40,9 @@ find_member(Member* head, char* name)
     return NULL;
 }
 
-Block* new_block(Block* cur)
+Block* new_block()
 {
     Block* new = calloc(1, sizeof(Block));
-    cur->next = new;
     return new;
 }
 

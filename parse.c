@@ -330,6 +330,7 @@ Node* toplevel()
             }
             expect(")");
         }
+        //今のままだとint foo() return 42;みたいなコードのコンパイルが通る
         node->rhs = stmt();
         return node;
     } else {
@@ -363,6 +364,7 @@ Node* toplevel()
         return NULL;
     }
 }
+
 Node* stmt()
 {
     Node* node;
@@ -442,28 +444,23 @@ BLOCK=
         node->block = calloc(1, sizeof(Block));
 
         Block* current_block = node->block;
-        while (token->kind == TK_INT || token->kind == TK_CHAR || token->kind == TK_STRUCT) {
-            decl_lvar();
-        }
-        if (!(consume("}"))) {
-            for (;;) {
-                while (token->kind == TK_INT || token->kind == TK_CHAR) {
-                    decl_lvar();
-                }
+        // while (!consume("}"))とすることで，{}みたいな空のブロックにも対応できる
+        while (!consume("}")) {
+
+            //fprintf(stderr, "a %s", token->str);
+            if (token->kind == TK_INT || token->kind == TK_CHAR || token->kind == TK_STRUCT) {
+                decl_lvar();
+            } else {
                 current_block->stmt_node = stmt();
-
-                while (token->kind == TK_INT || token->kind == TK_CHAR) {
-                    decl_lvar();
-                }
-
+                //fprintf(stderr, "b %s", token->str);
                 if (consume("}"))
                     break;
-                current_block = new_block(current_block);
+                current_block->next = new_block(current_block);
+                current_block = current_block->next;
             }
-            current_block->next = NULL;
-        } else {
-            node->block = NULL;
+            //fprintf(stderr, "c %s", token->str);
         }
+        current_block->next = NULL;
         return node;
     } else {
         node = expr();
