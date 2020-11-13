@@ -179,6 +179,8 @@ int get_array_offset(Type* type);
 char* read_file(char* path);
 int get_array_dimesion(Type* type);
 
+void error(char* fmt, ...);
+void error_at(char* loc, char* fmt, ...);
 void node_name(NodeKind kind, char* s);
 void dumpAST(FILE* fp, Node* node);
 extern Token* token;

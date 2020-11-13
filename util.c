@@ -1,5 +1,35 @@
 #include "9cc.h"
 #include <errno.h>
+
+void error(char* fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
+
+void error_at(char* loc, char* fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    char* line = loc;
+    while (user_input < line && line[-1] != '\n') //負のインデックスはUB？
+    {
+        line--;
+    }
+    char* end = loc;
+    while (*end != '\n')
+        end++;
+    int pos = loc - line;
+    fprintf(stderr, "%.*s\n", (int)(end - line), line);
+    fprintf(stderr, "%*s", pos, " ");
+    fprintf(stderr, "^ ");
+    vfprintf(stderr, fmt, ap);
+    fprintf(stderr, "\n");
+    exit(1);
+}
 void node_name(NodeKind kind, char* s)
 {
     switch (kind) {
