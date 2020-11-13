@@ -351,6 +351,9 @@ Node* toplevel()
         }
         if (lvar->type->ty == INT) {
             lvar->size = 4 * size;
+        }
+        if (lvar->type->ty == CHAR) {
+            lvar->size = 1 * size;
         } else {
             // TODO: 他の型(structとか)も扱えるようにする
             lvar->size = 8 * size;
