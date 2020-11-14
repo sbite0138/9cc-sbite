@@ -109,6 +109,7 @@ struct Node {
     Arg* args; //kindがND_CALLの場合のみ使う
     int argnum; //kindがND_FUNCの場合のみ使う
     Type* type; //そのノードを処理した結果の型を持つ
+    Type* type2; //ノードの型（いずれはこちらに切り替える）
     Str* str; //kindがND_STRの場合のみ使う
 };
 struct Block {
@@ -161,6 +162,8 @@ void gen(Node* node);
 Node* new_node(NodeKind kind, Node* lhs, Node* rhs);
 Token* tokenize(char* p);
 Node* expr();
+
+int is_numeric(Type* type);
 
 void gen_globals();
 void gen_strings();

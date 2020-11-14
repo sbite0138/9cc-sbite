@@ -22,65 +22,66 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs)
     node->lhs = lhs;
     node->rhs = rhs;
     node->type = calloc(1, sizeof(Type));
+    node->type2 = calloc(1, sizeof(Type));
+
     // fprintf(stderr, "%d %d\n", lhs->type->ty, rhs->type->ty);
     // fprintf(stderr, "%s\n", token->str);
-    if (node->kind == ND_ADD || node->kind == ND_SUB) {
+    if (node->kind == ND_ADD) {
         //  fprintf(stderr, "%d %d\n", lhs->kind, rhs->kind);
         // print_type(node->lhs->type);
         if (lhs->type->ty == PTR && rhs->type->ty == PTR) {
-            error("ポインタ同士の加算/減算です:%s", token->str);
-        }
-        // int+int=int
-        else if (lhs->type->ty == INT && rhs->type->ty == INT) {
+            error("ポインタ同士の加算です:%s", token->str);
+        } else if (is_numeric(lhs->type) && is_numeric(rhs->type)) {
             node->type->ty = INT;
-        }
-        // char+char=int （本当です）
-        // https://wandbox.org/permlink/PtkWNhW6gY0Qz3RB)
-        else if (lhs->type->ty == CHAR && rhs->type->ty == CHAR) {
-            node->type->ty = INT;
-        }
-        // char+int=int
-        else if ((lhs->type->ty == CHAR && rhs->type->ty == INT) || (lhs->type->ty == INT && rhs->type->ty == CHAR)) {
-            node->type->ty = INT;
-        }
-        // array+int=PTR
-        else if ((lhs->type->ty == ARRAY && rhs->type->ty == INT) || (lhs->type->ty == INT && rhs->type->ty == ARRAY)) {
-            if (lhs->type->ty == ARRAY) {
-                node->type->ty = PTR;
+        } else if ((lhs->type->ty == ARRAY && is_numeric(rhs->type)) || (is_numeric(lhs->type) && rhs->type->ty == ARRAY)) {
+            node->type->ty = PTR;
+            assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
+            if (!is_numeric(lhs->type)) {
                 node->type->base = lhs->type->base;
             } else {
-                node->type->ty = PTR;
-                node->type->base = rhs->type->base;
-            }
-        }
-        // array+char=array (あるのか？)
-        else if ((lhs->type->ty == ARRAY && rhs->type->ty == CHAR) || (lhs->type->ty == CHAR && rhs->type->ty == ARRAY)) {
-            if (lhs->type->ty == ARRAY) {
-                node->type->ty = PTR;
-                node->type->base = lhs->type->base;
-            } else {
-                node->type->ty = PTR;
                 node->type->base = rhs->type->base;
             }
         } else {
-            // PTR+INTみたいな式のこと…？
-            if (lhs->type->ty == INT) {
-                assert(rhs->type->ty == PTR);
-
-                fprintf(stderr, "%d\n", rhs->type->ty);
-                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
-                node->type = rhs->type;
-            } else {
-                assert(lhs->type->ty == PTR);
-                fprintf(stderr, "%d\n", rhs->type->ty);
-
+            node->type->ty = PTR;
+            assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
+            if (!is_numeric(lhs->type)) {
                 node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
-                node->type = lhs->type;
+                node->type->base = lhs->type->base;
+            } else {
+                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
+                node->type->base = rhs->type->base;
             }
-            //  fprintf(stderr, "%d\n", node->type->ty == PTR);
+        }
+    } else if (node->kind == ND_SUB) {
+        //  fprintf(stderr, "%d %d\n", lhs->kind, rhs->kind);
+        // print_type(node->lhs->type);
+        if (is_numeric(lhs->type) && is_numeric(rhs->type)) {
+            //lhs,rhsともに数値
+            node->type->ty = INT;
+        } else if (!is_numeric(lhs->type) && !is_numeric(rhs->type)) {
+            //lhs,rhsともにポインタ
+            node->type->ty = INT;
+        } else if ((lhs->type->ty == ARRAY && is_numeric(rhs->type)) || (is_numeric(lhs->type) && rhs->type->ty == ARRAY)) {
+            node->type->ty = PTR;
+            assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
+            if (!is_numeric(lhs->type)) {
+                node->type->base = lhs->type->base;
+            } else {
+                node->type->base = rhs->type->base;
+            }
+        } else {
+            node->type->ty = PTR;
+            assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
+            if (!is_numeric(lhs->type)) {
+                node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
+                node->type->base = lhs->type->base;
+            } else {
+                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
+                node->type->base = rhs->type->base;
+            }
         }
     }
-
+    node->type2 = node->type;
     return node;
 }
 
