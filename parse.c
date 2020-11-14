@@ -11,7 +11,9 @@ Node* new_node_num(int val)
     node->kind = ND_NUM;
     node->val = val;
     node->type = calloc(1, sizeof(Type));
+    node->type2 = calloc(1, sizeof(Type));
     node->type->ty = INT; // calloc(1, sizeof(Type));
+    node->type2 = node->type;
     return node;
 }
 
@@ -614,7 +616,6 @@ Node* term()
                 node->args = NULL;
             }
             expect(")");
-
             return node;
         } else {
             int var_type;
