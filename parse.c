@@ -39,8 +39,10 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs)
             node->type->ty = PTR;
             assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
             if (!is_numeric(lhs->type)) {
+                node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
                 node->type->base = lhs->type->base;
             } else {
+                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
                 node->type->base = rhs->type->base;
             }
         } else {
@@ -649,10 +651,8 @@ Node* term()
                         Type* cur = lvar->type;
                         do {
                             Node* index = add();
-                            Node* mul = new_node(
-                                ND_MUL, index, new_node_num(type_size(cur->base)));
                             cur = cur->base;
-                            node = new_node(ND_ADD, node, mul);
+                            node = new_node(ND_ADD, node, index);
                             Node* deref = calloc(1, sizeof(Node));
                             deref->kind = ND_DEREF;
                             deref->rhs = node;

@@ -676,7 +676,7 @@ int test106()
     printf("----- The three values ​​below must be equal ----- \n");
     printf("%p\n", a106[a106[3][4]] + 3);
     printf("%p\n", &a106[a106[3][3]][3]);
-    printf("%d\n", a106[a106[3][4]][3]);
+    printf("%p\n", &a106[a106[3][4]][3]);
 
     return a106[a106[3][4]][3];
 }
@@ -687,7 +687,15 @@ int test107()
     a107[3][3] = 3;
     a107[4][5] = 3;
     a107[1][3] = 1;
-    return a107[a107[3][a107[3][5] + a107[a107[a107[1][a107[a107[3][3] + a107[1][3]][5]]][3]][3] + a107[1][3]]][a107[3][5]];
+
+    return a107[a107[a107[1][3] + 2][a107[a107[4][5]][a107[4][5]]]][a107[a107[a107[1][3] + a107[1][3] + a107[1][3]][a107[3][3]]][3]]; // returns 3!!!!
+}
+
+int test108()
+{
+    int a108[10][10][10];
+    a108[1][2][3] = 1;
+    return a108[a108[1][2][3]][2 * a108[1][2][3]][a108[1][2][3] + 3 - 1];
 }
 
 int main()
@@ -1125,6 +1133,10 @@ int main()
     if (test107() != 3) {
         errnum = errnum + 1;
         printf("test107() faild (actual:%d expect:%d)\n", test107(), 3);
+    }
+    if (test108() != 1) {
+        errnum = errnum + 1;
+        printf("test108() faild (actual:%d expect:%d)\n", test108(), 1);
     }
     if (errnum == 0) {
         printf("test passed!\n");
