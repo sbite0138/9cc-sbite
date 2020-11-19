@@ -9,12 +9,11 @@ int func()
 
 int main()
 {
-    if (func() <= 0)
-    {
+    //hjisaasdf
+    //asdasdf
+    if (func() <= 0) {
         printf("passed!\n");
-    }
-    else
-    {
+    } else {
         printf("func() faild (actual:%d expect:%d)\n", func(), -1);
     }
     return 0;

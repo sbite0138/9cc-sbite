@@ -1,6 +1,4 @@
 int main()
 {
-    int x;
-    x = 4;
-    printf("%d\n", x);
+    int x[100][100][100];
 }

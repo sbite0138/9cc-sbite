@@ -27,6 +27,13 @@ tokenize(char* p)
         if (isspace(*p) || *p == '\n') {
             p++;
             continue;
+        } else if (strncmp(p, "//", 2) == 0) {
+            p += 2;
+            while (*p != '\n') {
+                p++;
+            }
+            p++;
+            continue;
         }
         if ((memcmp(p, "==", 2) == 0) || (memcmp(p, "!=", 2) == 0) || (memcmp(p, "<=", 2) == 0) || (memcmp(p, ">=", 2) == 0)) {
             cur = new_token(TK_RESERVED, cur, p, 2);
@@ -109,6 +116,7 @@ tokenize(char* p)
             p += len;
             // fprintf(stderr, "%s\n", p);
             continue;
+
         } else if (isalpha(*p)) {
             int len = 0;
             // is_alnumは自作した関数で、標準で用意されているisalnumではない(前者は引数が'_'の場合もtrueを返す)
