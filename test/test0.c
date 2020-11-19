@@ -668,9 +668,13 @@ int test106()
     int a106[10][10];
     a106[3][3] = 3;
     a106[3][4] = 3;
-    printf("%p\n", a106);
+    printf("----- The three values ​​below must be equal ----- \n");
+    printf("%p\n", a106 + 3);
     printf("%p\n", a106[3]);
     printf("%p\n", a106[a106[3][4]]);
+
+    printf("----- The three values ​​below must be equal ----- \n");
+    printf("%p\n", a106[a106[3][4]] + 3);
     printf("%p\n", &a106[a106[3][3]][3]);
     printf("%d\n", a106[a106[3][4]][3]);
 
@@ -683,7 +687,6 @@ int test107()
     a107[3][3] = 3;
     a107[4][5] = 3;
     a107[1][3] = 1;
-    return 3;
     return a107[a107[3][a107[3][5] + a107[a107[a107[1][a107[a107[3][3] + a107[1][3]][5]]][3]][3] + a107[1][3]]][a107[3][5]];
 }
 

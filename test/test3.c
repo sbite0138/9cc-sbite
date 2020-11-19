@@ -1,4 +1,7 @@
 int main()
 {
-    int x[100][100][100];
+    int x[10][10];
+    x[1][2];
+    printf("%p\n", &x[1][2]);
+    return 0;
 }

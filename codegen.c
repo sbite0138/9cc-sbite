@@ -86,6 +86,7 @@ void gen(Node* node)
     switch (node->kind) {
     case ND_FUNC:
         strncpy(name, node->funcname, node->funcnamelen);
+        fprintf(stderr, "generate code for function %s\n", name);
         printf(".global %s\n", name);
         printf("%s:\n", name);
         printf("  push rbp\n");
@@ -140,12 +141,18 @@ void gen(Node* node)
     case ND_DEREF:
         //printf("#ND DEREF\n");
         //deref_nest++;
+        print_type(node->rhs->type);
         gen(node->rhs);
         //deref_nest--;
         printf("  pop rax\n");
         //fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
         //多分ここは*(a+INT)みたいな処理をアセンブルしていて、*(a+CHAR)みたいなのはgccでもWarnが出るので考えないことにします
         printf("#DEREF\n");
+        if (node->type->ty == ARRAY) {
+            printf("  #target is array. dereference is canceled. \n");
+            printf("  push rax\n");
+            return;
+        }
         if (node->rhs->type->base->ty == INT) {
             printf("  mov eax, DWORD  PTR[rax]\n");
         }

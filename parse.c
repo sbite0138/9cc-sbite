@@ -634,48 +634,35 @@ Node* term()
                     if (consume("[")) {
                         // lvar[0]みたいな部分はDEREFをする場合とそうでない場合があって，
                         // lvarばN次元配列の時，lvar[][][]...[] (K個)の時，K!=NならDEREFは行わない
-                        int dimesion = get_array_dimesion(lvar->type);
 
-                        //ND_NONEみたいなのを定義して，dimesionの結果に応じてkindを変更するのが良さそう...？
-                        node->kind = ND_DEREF;
+                        node->kind = var_type;
+                        node->offset = lvar->offset;
+                        node->type = calloc(1, sizeof(Type));
+                        node->type->ty = ARRAY;
+                        node->type->base = lvar->type->base;
 
-                        Node* node_lvar = calloc(1, sizeof(Node));
-                        node_lvar->kind = var_type;
-                        node_lvar->offset = lvar->offset;
-                        node_lvar->type = calloc(1, sizeof(Type));
-                        node_lvar->type->ty = PTR;
-                        node_lvar->type->base = lvar->type->base;
                         if (var_type == ND_GVAR) {
-                            node_lvar->gvarname = lvar->name;
-                            node_lvar->gvarnamelen = lvar->len;
+                            node->gvarname = lvar->name;
+                            node->gvarnamelen = lvar->len;
                         }
 
-                        Node* node_addr = calloc(1, sizeof(Node));
-                        node_addr->kind = ND_ADDR;
-                        node_addr->rhs = node_lvar;
-                        node_addr->type = calloc(1, sizeof(Type));
-                        node_addr->type->ty = ARRAY;
-                        node_addr->type->base = node_lvar->type->base;
-                        node->rhs = node_addr;
-                        node->type = node->rhs->type;
                         Type* cur = lvar->type;
                         do {
-                            Node* node_index = add();
-                            Node* mul_node = new_node(
-                                ND_MUL, node_index, new_node_num(type_size(cur->base)));
+                            Node* index = add();
+                            Node* mul = new_node(
+                                ND_MUL, index, new_node_num(type_size(cur->base)));
                             cur = cur->base;
-                            node->rhs = new_node(ND_ADD, node->rhs, mul_node);
-                            node->type = node->type->base;
-                            dimesion--;
+                            node = new_node(ND_ADD, node, mul);
+                            Node* deref = calloc(1, sizeof(Node));
+                            deref->kind = ND_DEREF;
+                            deref->rhs = node;
+                            deref->type = node->type->base;
+                            node = deref;
                             expect("]");
                         } while (consume("["));
-                        fprintf(stderr, "rest dim -> %d\n", dimesion);
-                        if (dimesion > 0) {
-                            node->kind = ND_NOP;
-                        }
                         // node->type = calloc(1, sizeof(Type));
 
-                        // print_type(node->type);
+                        print_type(node->type);
 
                         // node->type = node->type->ptr_to;
                     } else {
