@@ -69,7 +69,7 @@ typedef struct Block Block;
 typedef struct Variable Variable;
 typedef struct Str Str;
 typedef struct Arg Arg;
-typedef struct Tag Tag;
+typedef struct Struct Struct;
 typedef struct Type Type;
 typedef struct Member Member;
 
@@ -126,8 +126,8 @@ struct Variable {
     Type* type;
 };
 
-struct Tag {
-    Tag* next;
+struct Struct {
+    Struct* next;
     char* name;
     int len;
     Type* type;
@@ -148,6 +148,7 @@ struct Arg {
 void error(char* fmt, ...);
 
 void program();
+Type* decl_type();
 Node* toplevel();
 Node* stmt();
 Node* expr();
@@ -193,7 +194,7 @@ extern Variable* func_variables[256];
 extern Variable* locals;
 extern Variable* globals;
 extern Str* strings;
-
+extern Struct* structs;
 extern int label;
 extern char** arg_reg_32;
 extern char** arg_reg_64;

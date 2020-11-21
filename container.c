@@ -2,7 +2,7 @@
 
 Variable* locals;
 Variable* globals;
-Tag* tags;
+Struct* structs;
 Str* strings;
 
 Variable* find_variable(Token* tok, Variable* root)
@@ -15,12 +15,12 @@ Variable* find_variable(Token* tok, Variable* root)
     }
     return NULL;
 }
-Tag* find_tag(Token* tok)
+Struct* find_struct(Token* tok)
 {
-    Tag* tag = tags;
-    for (; tag != NULL; tag = tag->next) {
-        if (tag->len == tok->len && !memcmp(tok->str, tag->name, tag->len)) {
-            return tag;
+    Struct* str = structs;
+    for (; str != NULL; str = str->next) {
+        if (str->len == tok->len && !memcmp(tok->str, str->name, str->len)) {
+            return str;
         }
     }
     return NULL;

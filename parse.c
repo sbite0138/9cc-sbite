@@ -197,36 +197,63 @@ void program()
     code[i] = NULL;
 }
 
+Type* menber()
+{
+    Type* type = calloc(1, sizeof(Type));
+    type->ty = STRUCT;
+    //無名構造体
+    type->members = calloc(1, sizeof(Member));
+    Member* cur = type->members;
+    int offset = 0;
+    while (true) {
+
+        cur->ty = decl_type();
+        cur->name = token->str;
+        cur->len = token->len;
+        cur->offset = offset;
+        offset += type_size(cur->ty);
+        next_token();
+        consume(";");
+        if (consume("}"))
+            break;
+        Member* next = calloc(1, sizeof(Member));
+        cur->next = next;
+        cur = next;
+    }
+    return type;
+}
+
 Type* decl_type()
 {
     int base_type = token->kind;
-    next_token();
+    next_token(); // ここで int char struct などが読み飛ばされる
     Type* type = calloc(1, sizeof(Type));
 
     if (base_type == TK_STRUCT) {
-        type->ty = STRUCT;
-        if (consume("{")) {
-            //無名構造体
-            type->members = calloc(1, sizeof(Member));
-            Member* cur = type->members;
-            int offset = 0;
-            while (true) {
+        fprintf(stderr, "enter block1\n");
+        fprintf(stderr, "current token :%s\n", token->str);
 
-                cur->ty = decl_type();
-                cur->name = token->str;
-                cur->len = token->len;
-                cur->offset = offset;
-                offset += type_size(cur->ty);
-                next_token();
-                consume(";");
-                if (consume("}"))
-                    break;
-                Member* next = calloc(1, sizeof(Member));
-                cur->next = next;
-                cur = next;
-            }
+        type->ty = STRUCT;
+
+        if (consume("{")) {
+            fprintf(stderr, "enter block2\n");
+            type = menber();
+            return type;
+        } else {
+            //名前付き構造体
+            fprintf(stderr, "enter block3\n");
+            fprintf(stderr, "current token :\n---------------------\n%s\n--------------------\n", token->str);
+
+            Struct* str = calloc(1, sizeof(Struct));
+            str->name = token->str;
+            str->len = token->len;
+            next_token();
+            expect("{");
+            str->type = menber();
+            str->next = structs;
+            structs = str;
+            return str->type;
         }
-        return type;
     } else {
 
         Type* cur = type;
@@ -252,6 +279,8 @@ void decl_lvar()
     Variable* lvar = calloc(1, sizeof(Variable));
 
     Type* base = decl_type();
+    fprintf(stderr, "hogehoge");
+
     if (consume(";")) {
         return;
     }
@@ -299,12 +328,16 @@ void decl_lvar()
     // node->offset = lvar->offset;
 
     locals = lvar;
+    //fprintf(stderr, "a");
     expect(";");
+    //fprintf(stderr, "b");
 }
 Node* toplevel()
 {
     Type* type = decl_type();
-
+    if (consume(";")) {
+        return NULL;
+    }
     Node* node = calloc(1, sizeof(Node));
     char* name = token->str;
     int len = token->len;
@@ -365,7 +398,9 @@ Node* toplevel()
             lvar->size = 8 * size;
         }
         globals = lvar;
+        //fprintf(stderr, "c");
         expect(";");
+        //fprintf(stderr, "d");
         return NULL;
     }
 }
@@ -377,7 +412,9 @@ Node* stmt()
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = expr();
+        //fprintf(stderr, "e");
         expect(";");
+        //fprintf(stderr, "f");
         return node;
     } else if (consume_tokenkind(TK_IF)) {
         expect("(");
@@ -469,7 +506,10 @@ BLOCK=
         return node;
     } else {
         node = expr();
+        //fprintf(stderr, "g");
         expect(";");
+        //fprintf(stderr, "h");
+
         return node;
     }
     // never reachable!!!
@@ -666,19 +706,25 @@ Node* term()
 
                         // node->type = node->type->ptr_to;
                     } else {
-                        node->kind = ND_ADDR;
-                        Node* node_lvar = calloc(1, sizeof(Node));
-                        node_lvar->kind = var_type;
-                        node_lvar->offset = lvar->offset;
-                        node_lvar->type = lvar->type;
-                        if (var_type == ND_GVAR) {
-                            node_lvar->gvarname = lvar->name;
-                            node_lvar->gvarnamelen = lvar->len;
-                        }
-                        node->rhs = node_lvar;
+                        fprintf(stderr, "entered else block!\n");
+                        node->offset = lvar->offset;
                         node->type = calloc(1, sizeof(Type));
-                        node->type->ty = PTR;
-                        node->type->base = lvar->type->base;
+                        node->type = lvar->type;
+                        if (var_type == ND_GVAR) {
+                            node->gvarname = lvar->name;
+                            node->gvarnamelen = lvar->len;
+                        }
+                        // node->kind = ND_ADDR;
+                        // Node* node_lvar = calloc(1, sizeof(Node));
+                        // node_lvar->kind = var_type;
+                        // node_lvar->offset = lvar->offset;
+                        // node_lvar->type = lvar->type;
+
+                        // node = node_lvar;
+                        // node->rhs = node_lvar;
+                        // node->type = calloc(1, sizeof(Type));
+                        // node->type->ty = PTR;
+                        // node->type->base = lvar->type->base;
                     }
                 } else if (lvar->type->ty == STRUCT) {
                     if (consume(".")) {

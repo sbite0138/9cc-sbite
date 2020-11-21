@@ -28,6 +28,7 @@ void error_at(char* loc, char* fmt, ...)
     fprintf(stderr, "^ ");
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
+    assert(false);
     exit(1);
 }
 void node_name(NodeKind kind, char* s)
