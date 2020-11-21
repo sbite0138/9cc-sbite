@@ -172,6 +172,7 @@ char* read_file(char* path)
 
 int type_size(Type* type)
 {
+
     if (type->ty == CHAR) {
         return 1;
     }

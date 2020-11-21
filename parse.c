@@ -106,6 +106,12 @@ void print_type(Type* type)
         fprintf(stderr, "ARRAY[%d]->", type->array_size);
         print_type(type->base);
         return;
+    case STRUCT:
+        fprintf(stderr, "STRUCT {\n");
+        for (Member* cur = type->members; cur != NULL; cur = cur->next) {
+            print_type(cur->ty);
+        }
+        fprintf(stderr, "}\n");
     }
 }
 
@@ -207,12 +213,50 @@ Type* menber()
     int offset = 0;
     while (true) {
 
-        cur->ty = decl_type();
+        Type* base = decl_type();
+        Type* head = NULL;
+        Type* tail = NULL;
+        Type* arr_type;
         cur->name = token->str;
         cur->len = token->len;
         cur->offset = offset;
-        offset += type_size(cur->ty);
+
         next_token();
+        while (consume("[")) {
+            // head->...->cur->base #=> head->...->cur->node->base にする
+            arr_type = calloc(1, sizeof(Type));
+
+            arr_type->ty = ARRAY;
+            arr_type->array_size = token->val;
+            //fprintf(stderr, "head %p\n", head);
+            //fprintf(stderr, "tail %p\n", tail);
+
+            if (head == NULL) {
+                //fprintf(stderr, "head is NULL\n");
+                head = arr_type;
+                tail = arr_type;
+            } else {
+                //fprintf(stderr, "head is not NULL\n");
+                tail->base = arr_type;
+                tail = arr_type;
+            }
+            //fprintf(stderr, "head %p\n", head);
+            //fprintf(stderr, "tail %p\n", tail);
+            next_token();
+            expect("]");
+            //fprintf(stderr, "current token :\n---------------------\n%s\n--------------------\n", token->str);
+            //fprintf(stderr, "head %p\n", head);
+            //fprintf(stderr, "tail %p\n", tail);
+        }
+        //fprintf(stderr, "head %p\n", head);
+        //fprintf(stderr, "tail %p\n", tail);
+        if (head != NULL) {
+            tail->base = base;
+            cur->ty = head;
+        } else {
+            cur->ty = base;
+        }
+        cur->offset += type_size(cur->ty);
         consume(";");
         if (consume("}"))
             break;
@@ -244,7 +288,14 @@ Type* decl_type()
             //fprintf(stderr, "enter block3\n");
             //fprintf(stderr, "current token :\n---------------------\n%s\n--------------------\n", token->str);
 
-            Struct* str = calloc(1, sizeof(Struct));
+            //token->strで示された構造体がすでに存在するかを調査する
+            Struct* str = find_struct(token);
+            if (str != NULL) {
+                //すでにtoken->strの名前で構造体が定義されているので，その構造体の型を返す
+                next_token();
+                return str->type;
+            }
+            str = calloc(1, sizeof(Struct));
             str->name = token->str;
             str->len = token->len;
             next_token();
@@ -284,6 +335,8 @@ void decl_lvar()
     if (consume(";")) {
         return;
     }
+    //fprintf(stderr, "current token :\n---------------------\n%s\n--------------------\n", token->str);
+
     Type* head = NULL;
     Type* cur = NULL;
     lvar->next = locals;
@@ -620,6 +673,8 @@ Node* unary()
     }
     if (consume_tokenkind(TK_SIZEOF)) {
         Node* node = unary();
+        fprintf(stderr, "enter sizeof\n");
+        print_type(node->type);
         return new_node_num(type_size(node->type));
     }
     return term();
@@ -702,11 +757,10 @@ Node* term()
                         } while (consume("["));
                         // node->type = calloc(1, sizeof(Type));
 
-                        print_type(node->type);
+                        // print_type(node->type);
 
                         // node->type = node->type->ptr_to;
                     } else {
-                        fprintf(stderr, "entered else block!\n");
                         node->offset = lvar->offset;
                         node->type = calloc(1, sizeof(Type));
                         node->type = lvar->type;
