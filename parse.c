@@ -230,19 +230,19 @@ Type* decl_type()
     Type* type = calloc(1, sizeof(Type));
 
     if (base_type == TK_STRUCT) {
-        fprintf(stderr, "enter block1\n");
-        fprintf(stderr, "current token :%s\n", token->str);
+        //fprintf(stderr, "enter block1\n");
+        //fprintf(stderr, "current token :%s\n", token->str);
 
         type->ty = STRUCT;
 
         if (consume("{")) {
-            fprintf(stderr, "enter block2\n");
+            //fprintf(stderr, "enter block2\n");
             type = menber();
             return type;
         } else {
             //名前付き構造体
-            fprintf(stderr, "enter block3\n");
-            fprintf(stderr, "current token :\n---------------------\n%s\n--------------------\n", token->str);
+            //fprintf(stderr, "enter block3\n");
+            //fprintf(stderr, "current token :\n---------------------\n%s\n--------------------\n", token->str);
 
             Struct* str = calloc(1, sizeof(Struct));
             str->name = token->str;
@@ -279,7 +279,7 @@ void decl_lvar()
     Variable* lvar = calloc(1, sizeof(Variable));
 
     Type* base = decl_type();
-    fprintf(stderr, "hogehoge");
+    //fprintf(stderr, "hogehoge");
 
     if (consume(";")) {
         return;
