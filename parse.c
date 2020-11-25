@@ -1,13 +1,13 @@
 #include "9cc.h"
 
-Token* token;
-char* user_input;
-Node* code[1024];
-Variable* func_variables[256];
+Token *token;
+char *user_input;
+Node *code[1024];
+Variable *func_variables[256];
 
-Node* new_node_num(int val)
+Node *new_node_num(int val)
 {
-    Node* node = calloc(1, sizeof(Node));
+    Node *node = calloc(1, sizeof(Node));
     node->kind = ND_NUM;
     node->val = val;
     node->type = calloc(1, sizeof(Type));
@@ -17,9 +17,9 @@ Node* new_node_num(int val)
     return node;
 }
 
-Node* new_node(NodeKind kind, Node* lhs, Node* rhs)
+Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
-    Node* node = calloc(1, sizeof(Node));
+    Node *node = calloc(1, sizeof(Node));
     node->kind = kind;
     node->lhs = lhs;
     node->rhs = rhs;
@@ -28,58 +28,87 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs)
 
     // fprintf(stderr, "%d %d\n", lhs->type->ty, rhs->type->ty);
     // fprintf(stderr, "%s\n", token->str);
-    if (node->kind == ND_ADD) {
+    if (node->kind == ND_ADD)
+    {
         //  fprintf(stderr, "%d %d\n", lhs->kind, rhs->kind);
         // print_type(node->lhs->type);
-        if (lhs->type->ty == PTR && rhs->type->ty == PTR) {
+        if (lhs->type->ty == PTR && rhs->type->ty == PTR)
+        {
             error("ポインタ同士の加算です:%s", token->str);
-        } else if (is_numeric(lhs->type) && is_numeric(rhs->type)) {
+        }
+        else if (is_numeric(lhs->type) && is_numeric(rhs->type))
+        {
             node->type->ty = INT;
-        } else if ((lhs->type->ty == ARRAY && is_numeric(rhs->type)) || (is_numeric(lhs->type) && rhs->type->ty == ARRAY)) {
+        }
+        else if ((lhs->type->ty == ARRAY && is_numeric(rhs->type)) || (is_numeric(lhs->type) && rhs->type->ty == ARRAY))
+        {
             node->type->ty = PTR;
             assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
-            if (!is_numeric(lhs->type)) {
+            if (!is_numeric(lhs->type))
+            {
                 node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
                 node->type->base = lhs->type->base;
-            } else {
-                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
-                node->type->base = rhs->type->base;
             }
-        } else {
-            node->type->ty = PTR;
-            assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
-            if (!is_numeric(lhs->type)) {
-                node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
-                node->type->base = lhs->type->base;
-            } else {
+            else
+            {
                 node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
                 node->type->base = rhs->type->base;
             }
         }
-    } else if (node->kind == ND_SUB) {
-        //  fprintf(stderr, "%d %d\n", lhs->kind, rhs->kind);
-        // print_type(node->lhs->type);
-        if (is_numeric(lhs->type) && is_numeric(rhs->type)) {
-            //lhs,rhsともに数値
-            node->type->ty = INT;
-        } else if (!is_numeric(lhs->type) && !is_numeric(rhs->type)) {
-            //lhs,rhsともにポインタ
-            node->type->ty = INT;
-        } else if ((lhs->type->ty == ARRAY && is_numeric(rhs->type)) || (is_numeric(lhs->type) && rhs->type->ty == ARRAY)) {
+        else
+        {
             node->type->ty = PTR;
             assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
-            if (!is_numeric(lhs->type)) {
-                node->type->base = lhs->type->base;
-            } else {
-                node->type->base = rhs->type->base;
-            }
-        } else {
-            node->type->ty = PTR;
-            assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
-            if (!is_numeric(lhs->type)) {
+            if (!is_numeric(lhs->type))
+            {
                 node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
                 node->type->base = lhs->type->base;
-            } else {
+            }
+            else
+            {
+                node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
+                node->type->base = rhs->type->base;
+            }
+        }
+    }
+    else if (node->kind == ND_SUB)
+    {
+        //  fprintf(stderr, "%d %d\n", lhs->kind, rhs->kind);
+        // print_type(node->lhs->type);
+        if (is_numeric(lhs->type) && is_numeric(rhs->type))
+        {
+            //lhs,rhsともに数値
+            node->type->ty = INT;
+        }
+        else if (!is_numeric(lhs->type) && !is_numeric(rhs->type))
+        {
+            //lhs,rhsともにポインタ
+            node->type->ty = INT;
+        }
+        else if ((lhs->type->ty == ARRAY && is_numeric(rhs->type)) || (is_numeric(lhs->type) && rhs->type->ty == ARRAY))
+        {
+            node->type->ty = PTR;
+            assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
+            if (!is_numeric(lhs->type))
+            {
+                node->type->base = lhs->type->base;
+            }
+            else
+            {
+                node->type->base = rhs->type->base;
+            }
+        }
+        else
+        {
+            node->type->ty = PTR;
+            assert(is_numeric(lhs->type) + is_numeric(rhs->type) == 1);
+            if (!is_numeric(lhs->type))
+            {
+                node->rhs = new_node(ND_MUL, rhs, new_node_num(type_size(lhs->type->base)));
+                node->type->base = lhs->type->base;
+            }
+            else
+            {
                 node->lhs = new_node(ND_MUL, lhs, new_node_num(type_size(rhs->type->base)));
                 node->type->base = rhs->type->base;
             }
@@ -89,9 +118,10 @@ Node* new_node(NodeKind kind, Node* lhs, Node* rhs)
     return node;
 }
 
-void print_type(Type* type)
+void print_type(Type *type)
 {
-    switch (type->ty) {
+    switch (type->ty)
+    {
     case INT:
         fprintf(stderr, "INT\n");
         return;
@@ -108,16 +138,18 @@ void print_type(Type* type)
         return;
     case STRUCT:
         fprintf(stderr, "STRUCT {\n");
-        for (Member* cur = type->members; cur != NULL; cur = cur->next) {
+        for (Member *cur = type->members; cur != NULL; cur = cur->next)
+        {
             print_type(cur->ty);
         }
         fprintf(stderr, "}\n");
     }
 }
 
-bool consume(char* op)
+bool consume(char *op)
 {
-    if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len)) {
+    if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len))
+    {
         return false;
     }
     token = token->next;
@@ -126,26 +158,29 @@ bool consume(char* op)
 
 bool consume_tokenkind(TokenKind kind)
 {
-    if (token->kind != kind) {
+    if (token->kind != kind)
+    {
         return false;
     }
     token = token->next;
     return true;
 }
 
-Token* consume_ident()
+Token *consume_ident()
 {
-    if (token->kind != TK_IDENT) {
+    if (token->kind != TK_IDENT)
+    {
         return NULL;
     }
-    Token* tok = token;
+    Token *tok = token;
     token = token->next;
     return tok;
 }
 
-void expect(char* op)
+void expect(char *op)
 {
-    if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len)) {
+    if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len))
+    {
         error_at(token->str, "'%s'ではありません", op);
     }
     token = token->next;
@@ -153,7 +188,8 @@ void expect(char* op)
 
 int expect_number()
 {
-    if (token->kind != TK_NUM) {
+    if (token->kind != TK_NUM)
+    {
         error_at(token->str, "数ではありません");
     }
     int val = token->val;
@@ -167,16 +203,18 @@ bool at_eof()
 }
 void next_token()
 {
-    if (at_eof()) {
+    if (at_eof())
+    {
         error("プログラムの終端でnext_token()が呼ばれました\n");
     }
     token = token->next;
 }
 
 //現在のトークンのstrがopで指定したものか調べる関数
-bool check_token(char* op)
+bool check_token(char *op)
 {
-    if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len)) {
+    if (token->kind != TK_RESERVED || strlen(op) != token->len || memcmp(token->str, op, token->len))
+    {
         return false;
     }
     return true;
@@ -187,14 +225,16 @@ void program()
     int i = 0;
     globals = NULL;
     strings = NULL;
-    while (!at_eof()) {
+    while (!at_eof())
+    {
         locals = calloc(1, sizeof(Variable));
         locals->offset = 8;
         code[i] = toplevel();
         //トップレベルには関数かグローバル変数の定義が入る。
         //グローバル変数の場合、戻り値はNULLになる（宣言は新しいnodeを生成しないので）
         //返った結果がNULLかどうかで処理を分けている
-        if (code[i] != NULL) {
+        if (code[i] != NULL)
+        {
             func_variables[i] = locals;
             i += 1;
         }
@@ -203,26 +243,28 @@ void program()
     code[i] = NULL;
 }
 
-Type* menber()
+Type *menber()
 {
-    Type* type = calloc(1, sizeof(Type));
+    Type *type = calloc(1, sizeof(Type));
     type->ty = STRUCT;
     //無名構造体
     type->members = calloc(1, sizeof(Member));
-    Member* cur = type->members;
+    Member *cur = type->members;
     int offset = 0;
-    while (true) {
+    while (true)
+    {
 
-        Type* base = decl_type();
-        Type* head = NULL;
-        Type* tail = NULL;
-        Type* arr_type;
+        Type *base = decl_type();
+        Type *head = NULL;
+        Type *tail = NULL;
+        Type *arr_type;
         cur->name = token->str;
         cur->len = token->len;
         cur->offset = offset;
 
         next_token();
-        while (consume("[")) {
+        while (consume("["))
+        {
             // head->...->cur->base #=> head->...->cur->node->base にする
             arr_type = calloc(1, sizeof(Type));
 
@@ -231,11 +273,14 @@ Type* menber()
             //fprintf(stderr, "head %p\n", head);
             //fprintf(stderr, "tail %p\n", tail);
 
-            if (head == NULL) {
+            if (head == NULL)
+            {
                 //fprintf(stderr, "head is NULL\n");
                 head = arr_type;
                 tail = arr_type;
-            } else {
+            }
+            else
+            {
                 //fprintf(stderr, "head is not NULL\n");
                 tail->base = arr_type;
                 tail = arr_type;
@@ -250,47 +295,55 @@ Type* menber()
         }
         //fprintf(stderr, "head %p\n", head);
         //fprintf(stderr, "tail %p\n", tail);
-        if (head != NULL) {
+        if (head != NULL)
+        {
             tail->base = base;
             cur->ty = head;
-        } else {
+        }
+        else
+        {
             cur->ty = base;
         }
         cur->offset += type_size(cur->ty);
         consume(";");
         if (consume("}"))
             break;
-        Member* next = calloc(1, sizeof(Member));
+        Member *next = calloc(1, sizeof(Member));
         cur->next = next;
         cur = next;
     }
     return type;
 }
 
-Type* decl_type()
+Type *decl_type()
 {
     int base_type = token->kind;
     next_token(); // ここで int char struct などが読み飛ばされる
-    Type* type = calloc(1, sizeof(Type));
+    Type *type = calloc(1, sizeof(Type));
 
-    if (base_type == TK_STRUCT) {
+    if (base_type == TK_STRUCT)
+    {
         //fprintf(stderr, "enter block1\n");
         //fprintf(stderr, "current token :%s\n", token->str);
 
         type->ty = STRUCT;
 
-        if (consume("{")) {
+        if (consume("{"))
+        {
             //fprintf(stderr, "enter block2\n");
             type = menber();
             return type;
-        } else {
+        }
+        else
+        {
             //名前付き構造体
             //fprintf(stderr, "enter block3\n");
             //fprintf(stderr, "current token :\n---------------------\n%s\n--------------------\n", token->str);
 
             //token->strで示された構造体がすでに存在するかを調査する
-            Struct* str = find_struct(token);
-            if (str != NULL) {
+            Struct *str = find_struct(token);
+            if (str != NULL)
+            {
                 //すでにtoken->strの名前で構造体が定義されているので，その構造体の型を返す
                 next_token();
                 return str->type;
@@ -305,16 +358,20 @@ Type* decl_type()
             structs = str;
             return str->type;
         }
-    } else {
+    }
+    else
+    {
 
-        Type* cur = type;
-        while (consume("*")) {
+        Type *cur = type;
+        while (consume("*"))
+        {
             cur->ty = PTR;
-            Type* next = calloc(1, sizeof(Type));
+            Type *next = calloc(1, sizeof(Type));
             cur->base = next;
             cur = next;
         }
-        switch (base_type) {
+        switch (base_type)
+        {
         case TK_INT:
             cur->ty = INT;
             break;
@@ -327,18 +384,19 @@ Type* decl_type()
 }
 void decl_lvar()
 {
-    Variable* lvar = calloc(1, sizeof(Variable));
+    Variable *lvar = calloc(1, sizeof(Variable));
 
-    Type* base = decl_type();
+    Type *base = decl_type();
     //fprintf(stderr, "hogehoge");
 
-    if (consume(";")) {
+    if (consume(";"))
+    {
         return;
     }
     //fprintf(stderr, "current token :\n---------------------\n%s\n--------------------\n", token->str);
 
-    Type* head = NULL;
-    Type* cur = NULL;
+    Type *head = NULL;
+    Type *cur = NULL;
     lvar->next = locals;
     lvar->name = token->str;
     lvar->type = calloc(1, sizeof(Type));
@@ -346,18 +404,22 @@ void decl_lvar()
     next_token();
 
     int size = 1;
-    while (consume("[")) {
+    while (consume("["))
+    {
         // head->...->cur->base #=> head->...->cur->node->base にする
-        Type* node = calloc(1, sizeof(Type));
+        Type *node = calloc(1, sizeof(Type));
 
         node->ty = ARRAY;
         node->array_size = token->val;
 
         node->base = base;
-        if (head == NULL) {
+        if (head == NULL)
+        {
             head = node;
             cur = node;
-        } else {
+        }
+        else
+        {
             cur->base = node;
             cur = node;
         }
@@ -365,17 +427,25 @@ void decl_lvar()
         next_token();
         expect("]");
     }
-    if (head == NULL) {
+    if (head == NULL)
+    {
         lvar->type = base;
-    } else {
+    }
+    else
+    {
         lvar->type = head;
     }
 
-    if (lvar->type->ty == INT) {
+    if (lvar->type->ty == INT)
+    {
         lvar->offset = locals->offset + 4 * size;
-    } else if (lvar->type->ty == CHAR) {
+    }
+    else if (lvar->type->ty == CHAR)
+    {
         lvar->offset = locals->offset + size;
-    } else {
+    }
+    else
+    {
         lvar->offset = locals->offset + 8 * size;
     }
     // node->offset = lvar->offset;
@@ -385,26 +455,30 @@ void decl_lvar()
     expect(";");
     //fprintf(stderr, "b");
 }
-Node* toplevel()
+Node *toplevel()
 {
-    Type* type = decl_type();
-    if (consume(";")) {
+    Type *type = decl_type();
+    if (consume(";"))
+    {
         return NULL;
     }
-    Node* node = calloc(1, sizeof(Node));
-    char* name = token->str;
+    Node *node = calloc(1, sizeof(Node));
+    char *name = token->str;
     int len = token->len;
     next_token();
 
-    if (consume("(")) {
+    if (consume("("))
+    {
         node->kind = ND_FUNC;
         node->funcname = name;
         node->funcnamelen = len;
         node->argnum = 0;
-        Node* cur = node;
-        if (!consume(")")) {
-            for (;;) {
-                Variable* lvar = calloc(1, sizeof(Variable));
+        Node *cur = node;
+        if (!consume(")"))
+        {
+            for (;;)
+            {
+                Variable *lvar = calloc(1, sizeof(Variable));
                 lvar->type = decl_type();
                 // print_type(lvar->type);
                 lvar->next = locals;
@@ -415,7 +489,8 @@ Node* toplevel()
                 node->argnum += 1;
                 next_token();
 
-                if (!consume(",")) {
+                if (!consume(","))
+                {
                     break;
                 }
             }
@@ -424,15 +499,18 @@ Node* toplevel()
         //今のままだとint foo() return 42;みたいなコードのコンパイルが通る
         node->rhs = stmt();
         return node;
-    } else {
-        Variable* lvar = calloc(1, sizeof(Variable));
+    }
+    else
+    {
+        Variable *lvar = calloc(1, sizeof(Variable));
         lvar->type = type;
         lvar->next = globals;
         lvar->name = name;
         lvar->len = len;
         int size = 1;
-        while (consume("[")) {
-            Type* next = calloc(1, sizeof(Type));
+        while (consume("["))
+        {
+            Type *next = calloc(1, sizeof(Type));
             next->ty = ARRAY;
             next->base = lvar->type;
             lvar->type = next;
@@ -441,12 +519,16 @@ Node* toplevel()
             next_token();
             expect("]");
         }
-        if (lvar->type->ty == INT) {
+        if (lvar->type->ty == INT)
+        {
             lvar->size = 4 * size;
         }
-        if (lvar->type->ty == CHAR) {
+        if (lvar->type->ty == CHAR)
+        {
             lvar->size = 1 * size;
-        } else {
+        }
+        else
+        {
             // TODO: 他の型(structとか)も扱えるようにする
             lvar->size = 8 * size;
         }
@@ -458,10 +540,11 @@ Node* toplevel()
     }
 }
 
-Node* stmt()
+Node *stmt()
 {
-    Node* node;
-    if (consume_tokenkind(TK_RETURN)) {
+    Node *node;
+    if (consume_tokenkind(TK_RETURN))
+    {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
         node->lhs = expr();
@@ -469,21 +552,28 @@ Node* stmt()
         expect(";");
         //fprintf(stderr, "f");
         return node;
-    } else if (consume_tokenkind(TK_IF)) {
+    }
+    else if (consume_tokenkind(TK_IF))
+    {
         expect("(");
         node = calloc(1, sizeof(Node));
         node->kind = ND_IF;
         node->lhs = expr();
         expect(")");
-        Node* node_stmt_true = stmt();
-        if (consume_tokenkind(TK_ELSE)) {
+        Node *node_stmt_true = stmt();
+        if (consume_tokenkind(TK_ELSE))
+        {
             node->kind = ND_IFELSE;
             node->rhs = new_node(ND_IFELSE, node_stmt_true, stmt());
-        } else {
+        }
+        else
+        {
             node->rhs = node_stmt_true;
         }
         return node;
-    } else if (consume_tokenkind(TK_WHILE)) {
+    }
+    else if (consume_tokenkind(TK_WHILE))
+    {
         expect("(");
         node = calloc(1, sizeof(Node));
         node->kind = ND_WHILE;
@@ -491,33 +581,44 @@ Node* stmt()
         expect(")");
         node->rhs = stmt();
         return node;
-    } else if (consume_tokenkind(TK_FOR)) {
+    }
+    else if (consume_tokenkind(TK_FOR))
+    {
         expect("(");
         node = calloc(1, sizeof(Node));
         node->kind = ND_FOR;
 
         // for (A;B;C) D; のA,Bを格納するノード
-        Node* node_init_cond = calloc(1, sizeof(Node));
+        Node *node_init_cond = calloc(1, sizeof(Node));
 
         // for (A;B;C) D; のC,Dを格納するノード
-        Node* node_update_stmt = calloc(1, sizeof(Node));
-        if (!check_token(";")) {
+        Node *node_update_stmt = calloc(1, sizeof(Node));
+        if (!check_token(";"))
+        {
             node_init_cond->lhs = expr();
-        } else {
+        }
+        else
+        {
             node_init_cond->lhs = NULL;
         }
         consume(";");
 
-        if (!check_token(";")) {
+        if (!check_token(";"))
+        {
             node_init_cond->rhs = expr();
-        } else {
+        }
+        else
+        {
             node_init_cond->rhs = NULL;
         }
         consume(";");
 
-        if (!check_token(")")) {
+        if (!check_token(")"))
+        {
             node_update_stmt->lhs = expr();
-        } else {
+        }
+        else
+        {
             node_update_stmt->lhs = NULL;
         }
         consume(";");
@@ -527,7 +628,9 @@ Node* stmt()
         node->lhs = node_init_cond;
         node->rhs = node_update_stmt;
         return node;
-    } else if (consume("{")) {
+    }
+    else if (consume("{"))
+    {
         /*
 BLOCK=
 "{" (declvar* stmt declvar*)* "}" |
@@ -538,14 +641,18 @@ BLOCK=
         node->kind = ND_BLOCK;
         node->block = calloc(1, sizeof(Block));
 
-        Block* current_block = node->block;
+        Block *current_block = node->block;
         // while (!consume("}"))とすることで，{}みたいな空のブロックにも対応できる
-        while (!consume("}")) {
+        while (!consume("}"))
+        {
 
             //fprintf(stderr, "a %s", token->str);
-            if (token->kind == TK_INT || token->kind == TK_CHAR || token->kind == TK_STRUCT) {
+            if (token->kind == TK_INT || token->kind == TK_CHAR || token->kind == TK_STRUCT)
+            {
                 decl_lvar();
-            } else {
+            }
+            else
+            {
                 current_block->stmt_node = stmt();
                 //fprintf(stderr, "b %s", token->str);
                 if (consume("}"))
@@ -557,7 +664,9 @@ BLOCK=
         }
         current_block->next = NULL;
         return node;
-    } else {
+    }
+    else
+    {
         node = expr();
         //fprintf(stderr, "g");
         expect(";");
@@ -569,92 +678,126 @@ BLOCK=
     error("stmtで解釈できません:%s\n", token->str);
 }
 
-Node* expr()
+Node *expr()
 {
     return assign();
 }
 
-Node* assign()
+Node *assign()
 {
-    Node* node = equality();
-    if (consume("=")) {
+    Node *node = equality();
+    if (consume("="))
+    {
         node = new_node(ND_ASSIGN, node, assign());
     }
     return node;
 }
 
-Node* equality()
+Node *equality()
 {
-    Node* node = relational();
-    for (;;) {
-        if (consume("==")) {
+    Node *node = relational();
+    for (;;)
+    {
+        if (consume("=="))
+        {
             node = new_node(ND_EQ, node, relational());
-        } else if (consume("!=")) {
+        }
+        else if (consume("!="))
+        {
             node = new_node(ND_NEQ, node, relational());
-        } else {
+        }
+        else
+        {
             return node;
         }
     }
 }
 
-Node* relational()
+Node *relational()
 {
-    Node* node = add();
-    for (;;) {
-        if (consume("<=")) {
+    Node *node = add();
+    for (;;)
+    {
+        if (consume("<="))
+        {
             node = new_node(ND_LEQ, node, add());
-        } else if (consume(">=")) {
+        }
+        else if (consume(">="))
+        {
             node = new_node(ND_LEQ, add(), node);
-        } else if (consume("<")) {
+        }
+        else if (consume("<"))
+        {
             node = new_node(ND_LT, node, add());
-        } else if (consume(">")) {
+        }
+        else if (consume(">"))
+        {
             node = new_node(ND_LT, add(), node);
-        } else {
+        }
+        else
+        {
             return node;
         }
     }
 }
 
-Node* add()
+Node *add()
 {
-    Node* node = mul();
-    for (;;) {
-        if (consume("+")) {
+    Node *node = mul();
+    for (;;)
+    {
+        if (consume("+"))
+        {
             node = new_node(ND_ADD, node, mul());
-        } else if (consume("-")) {
+        }
+        else if (consume("-"))
+        {
             node = new_node(ND_SUB, node, mul());
-        } else {
+        }
+        else
+        {
             return node;
         }
     }
 }
 
-Node* mul()
+Node *mul()
 {
-    Node* node = unary();
-    for (;;) {
-        if (consume("*")) {
+    Node *node = unary();
+    for (;;)
+    {
+        if (consume("*"))
+        {
             node = new_node(ND_MUL, node, unary());
-        } else if (consume("/")) {
+        }
+        else if (consume("/"))
+        {
             node = new_node(ND_DIV, node, unary());
-        } else if (consume("%")) {
+        }
+        else if (consume("%"))
+        {
             node = new_node(ND_MOD, node, unary());
-        } else {
+        }
+        else
+        {
             return node;
         }
     }
 }
 
-Node* unary()
+Node *unary()
 {
-    if (consume("+")) {
+    if (consume("+"))
+    {
         return term();
     }
-    if (consume("-")) {
+    if (consume("-"))
+    {
         return new_node(ND_SUB, new_node_num(0), term());
     }
-    if (consume("&")) {
-        Node* node = calloc(1, sizeof(Node));
+    if (consume("&"))
+    {
+        Node *node = calloc(1, sizeof(Node));
         node->kind = ND_ADDR;
         node->rhs = unary();
         node->type = calloc(1, sizeof(Type));
@@ -663,16 +806,18 @@ Node* unary()
         return node;
     }
 
-    if (consume("*")) {
-        Node* node = calloc(1, sizeof(Node));
+    if (consume("*"))
+    {
+        Node *node = calloc(1, sizeof(Node));
         node->kind = ND_DEREF;
         node->rhs = unary();
         // node->type = calloc(1, sizeof(Type));
         node->type = node->rhs->type->base;
         return node;
     }
-    if (consume_tokenkind(TK_SIZEOF)) {
-        Node* node = unary();
+    if (consume_tokenkind(TK_SIZEOF))
+    {
+        Node *node = unary();
         fprintf(stderr, "enter sizeof\n");
         print_type(node->type);
         return new_node_num(type_size(node->type));
@@ -680,17 +825,20 @@ Node* unary()
     return term();
 }
 
-Node* term()
+Node *term()
 {
-    if (consume("(")) {
-        Node* node = expr();
+    if (consume("("))
+    {
+        Node *node = expr();
         expect(")");
         return node;
     }
-    Token* tok = consume_ident();
-    if (tok) {
-        if (consume("(")) {
-            Node* node = calloc(1, sizeof(Node));
+    Token *tok = consume_ident();
+    if (tok)
+    {
+        if (consume("("))
+        {
+            Node *node = calloc(1, sizeof(Node));
             node->args = calloc(1, sizeof(Arg));
             node->kind = ND_CALL;
             node->type = calloc(1, sizeof(Type));
@@ -698,9 +846,11 @@ Node* term()
             node->funcname = tok->str;
             node->funcnamelen = tok->len;
             node->argnum = 0;
-            Arg* curarg = node->args;
-            if (!check_token(")")) {
-                for (;;) {
+            Arg *curarg = node->args;
+            if (!check_token(")"))
+            {
+                for (;;)
+                {
                     curarg->node = expr();
                     node->argnum++;
                     // curarg->node->kind = ND_NUM;
@@ -709,26 +859,34 @@ Node* term()
                     curarg = new_arg(curarg);
                 }
                 curarg->next = NULL;
-            } else {
+            }
+            else
+            {
                 node->args = NULL;
             }
             expect(")");
             return node;
-        } else {
+        }
+        else
+        {
             int var_type;
-            Node* node = calloc(1, sizeof(Node));
+            Node *node = calloc(1, sizeof(Node));
             node->kind = ND_LVAR;
-            Variable* lvar = find_variable(tok, locals);
+            Variable *lvar = find_variable(tok, locals);
             var_type = ND_LVAR;
-            if (lvar == NULL) {
+            if (lvar == NULL)
+            {
                 node->kind = ND_GVAR;
                 var_type = ND_GVAR;
                 lvar = find_variable(tok, globals);
             }
-            if (lvar) {
-                if (lvar->type->ty == ARRAY) {
+            if (lvar)
+            {
+                if (lvar->type->ty == ARRAY)
+                {
                     // lvarが配列
-                    if (consume("[")) {
+                    if (consume("["))
+                    {
                         // lvar[0]みたいな部分はDEREFをする場合とそうでない場合があって，
                         // lvarばN次元配列の時，lvar[][][]...[] (K個)の時，K!=NならDEREFは行わない
 
@@ -738,17 +896,19 @@ Node* term()
                         node->type->ty = ARRAY;
                         node->type->base = lvar->type->base;
 
-                        if (var_type == ND_GVAR) {
+                        if (var_type == ND_GVAR)
+                        {
                             node->gvarname = lvar->name;
                             node->gvarnamelen = lvar->len;
                         }
 
-                        Type* cur = lvar->type;
-                        do {
-                            Node* index = add();
+                        Type *cur = lvar->type;
+                        do
+                        {
+                            Node *index = add();
                             cur = cur->base;
                             node = new_node(ND_ADD, node, index);
-                            Node* deref = calloc(1, sizeof(Node));
+                            Node *deref = calloc(1, sizeof(Node));
                             deref->kind = ND_DEREF;
                             deref->rhs = node;
                             deref->type = node->type->base;
@@ -760,11 +920,14 @@ Node* term()
                         // print_type(node->type);
 
                         // node->type = node->type->ptr_to;
-                    } else {
+                    }
+                    else
+                    {
                         node->offset = lvar->offset;
                         node->type = calloc(1, sizeof(Type));
                         node->type = lvar->type;
-                        if (var_type == ND_GVAR) {
+                        if (var_type == ND_GVAR)
+                        {
                             node->gvarname = lvar->name;
                             node->gvarnamelen = lvar->len;
                         }
@@ -780,64 +943,83 @@ Node* term()
                         // node->type->ty = PTR;
                         // node->type->base = lvar->type->base;
                     }
-                } else if (lvar->type->ty == STRUCT) {
-                    if (consume(".")) {
-                        Member* member = find_member(lvar->type->members, token->str);
+                }
+                else if (lvar->type->ty == STRUCT)
+                {
+                    if (consume("."))
+                    {
+                        Member *member = find_member(lvar->type->members, token->str);
                         node->offset = lvar->offset + member->offset;
                         node->type = member->ty;
                         // fprintf(stderr, "%p\n", member->ty);
                         next_token(token);
-                    } else {
-                        node->offset = lvar->offset;
-                        node->type = lvar->type;
-                        if (var_type == ND_GVAR) {
-                            node->gvarname = lvar->name;
-                            node->gvarnamelen = lvar->len;
-                        }
                     }
-                } else {
-                    if (consume("[") && lvar->type->ty == PTR) {
-                        node->kind = ND_DEREF;
-                        Node* node_lvar = calloc(1, sizeof(Node));
-                        node_lvar->kind = var_type;
-                        node_lvar->offset = lvar->offset;
-                        node_lvar->type = calloc(1, sizeof(Type));
-                        node_lvar->type->ty = PTR;
-                        node_lvar->type->base = lvar->type->base;
-                        if (var_type == ND_GVAR) {
-                            node_lvar->gvarname = lvar->name;
-                            node_lvar->gvarnamelen = lvar->len;
-                        }
-                        Node* node_index = add();
-                        node->rhs = new_node(ND_ADD, node_lvar, node_index);
-                        node->type = node->rhs->type->base;
-                        expect("]");
-                    } else {
+                    else
+                    {
                         node->offset = lvar->offset;
                         node->type = lvar->type;
-                        if (var_type == ND_GVAR) {
+                        if (var_type == ND_GVAR)
+                        {
                             node->gvarname = lvar->name;
                             node->gvarnamelen = lvar->len;
                         }
                     }
                 }
-            } else {
-                char* name = calloc(128, sizeof(char));
+                else
+                {
+                    if (consume("[") && lvar->type->ty == PTR)
+                    {
+                        node->kind = ND_DEREF;
+                        Node *node_lvar = calloc(1, sizeof(Node));
+                        node_lvar->kind = var_type;
+                        node_lvar->offset = lvar->offset;
+                        node_lvar->type = calloc(1, sizeof(Type));
+                        node_lvar->type->ty = PTR;
+                        node_lvar->type->base = lvar->type->base;
+                        if (var_type == ND_GVAR)
+                        {
+                            node_lvar->gvarname = lvar->name;
+                            node_lvar->gvarnamelen = lvar->len;
+                        }
+                        Node *node_index = add();
+                        node->rhs = new_node(ND_ADD, node_lvar, node_index);
+                        node->type = node->rhs->type->base;
+                        expect("]");
+                    }
+                    else
+                    {
+                        node->offset = lvar->offset;
+                        node->type = lvar->type;
+                        if (var_type == ND_GVAR)
+                        {
+                            node->gvarname = lvar->name;
+                            node->gvarnamelen = lvar->len;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                char *name = calloc(128, sizeof(char));
                 strncpy(name, tok->str, tok->len);
                 error("定義されていない変数名です:%s\n", name);
             }
             return node;
         }
     }
-    if (token->kind == TK_STR) {
-        Node* node = calloc(1, sizeof(Node));
+    if (token->kind == TK_STR)
+    {
+        Node *node = calloc(1, sizeof(Node));
         node->kind = ND_STR;
-        Str* str = calloc(1, sizeof(Str));
+        Str *str = calloc(1, sizeof(Str));
         str->str = token->str;
         str->len = token->len;
-        if (strings == NULL) {
+        if (strings == NULL)
+        {
             str->id = 0;
-        } else {
+        }
+        else
+        {
             str->id = strings->id + 1;
         }
         str->next = strings;

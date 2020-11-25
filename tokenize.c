@@ -5,108 +5,147 @@ bool is_alnum(char c)
 }
 
 // lenはTK_RESERVED(記号)のときに使い、記号の文字長を表す。それ以外のときは-1を入れておく
-Token*
-new_token(TokenKind kind, Token* cur, char* str, int len)
+Token *
+new_token(TokenKind kind, Token *cur, char *str, int len)
 {
-    Token* tok = calloc(1, sizeof(Token));
+    Token *tok = calloc(1, sizeof(Token));
     tok->kind = kind;
     tok->str = str;
     tok->len = len;
     cur->next = tok;
     return tok;
 }
-Token*
-tokenize(char* p)
+Token *
+tokenize(char *p)
 {
     Token head;
     head.next = NULL;
-    Token* cur = &head;
+    Token *cur = &head;
 
-    while (*p) {
+    while (*p)
+    {
         // fprintf(stderr, "%c\n", *p);
-        if (isspace(*p) || *p == '\n') {
+        if (isspace(*p) || *p == '\n')
+        {
             p++;
             continue;
-        } else if (strncmp(p, "//", 2) == 0) {
+        }
+        else if (strncmp(p, "//", 2) == 0)
+        {
             p += 2;
-            while (*p != '\n') {
+            while (*p != '\n')
+            {
                 p++;
             }
             p++;
             continue;
         }
-        if ((memcmp(p, "==", 2) == 0) || (memcmp(p, "!=", 2) == 0) || (memcmp(p, "<=", 2) == 0) || (memcmp(p, ">=", 2) == 0)) {
+        if ((memcmp(p, "==", 2) == 0) || (memcmp(p, "!=", 2) == 0) || (memcmp(p, "<=", 2) == 0) || (memcmp(p, ">=", 2) == 0))
+        {
             cur = new_token(TK_RESERVED, cur, p, 2);
             p += 2;
             continue;
-        } else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '.' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',' || *p == '&' || *p == '[' || *p == ']') {
+        }
+        else if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '%' || *p == '.' || *p == '(' || *p == ')' || *p == '<' || *p == '>' || *p == '=' || *p == ';' || *p == '{' || *p == '}' || *p == ',' || *p == '&' || *p == '[' || *p == ']')
+        {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
-        } else if ((strncmp(p, "if", 2) == 0) && !is_alnum(p[2])) {
+        }
+        else if ((strncmp(p, "if", 2) == 0) && !is_alnum(p[2]))
+        {
             cur = new_token(TK_IF, cur, p, 2);
             p += 2;
             continue;
-        } else if ((strncmp(p, "else", 4) == 0) && !is_alnum(p[4])) {
+        }
+        else if ((strncmp(p, "else", 4) == 0) && !is_alnum(p[4]))
+        {
             cur = new_token(TK_ELSE, cur, p, 4);
             p += 4;
             continue;
-        } else if ((strncmp(p, "while", 5) == 0) && !is_alnum(p[5])) {
+        }
+        else if ((strncmp(p, "while", 5) == 0) && !is_alnum(p[5]))
+        {
             cur = new_token(TK_WHILE, cur, p, 5);
             p += 5;
             continue;
-        } else if ((strncmp(p, "for", 3) == 0) && !is_alnum(p[3])) {
+        }
+        else if ((strncmp(p, "for", 3) == 0) && !is_alnum(p[3]))
+        {
             cur = new_token(TK_FOR, cur, p, 3);
             p += 3;
             continue;
-        } else if ((strncmp(p, "sizeof", 6) == 0) && !is_alnum(p[6])) {
+        }
+        else if ((strncmp(p, "sizeof", 6) == 0) && !is_alnum(p[6]))
+        {
             cur = new_token(TK_SIZEOF, cur, p, 6);
             p += 6;
             continue;
-        } else if ((strncmp(p, "return", 6) == 0) && !is_alnum(p[6])) {
+        }
+        else if ((strncmp(p, "return", 6) == 0) && !is_alnum(p[6]))
+        {
             cur = new_token(TK_RETURN, cur, p, 6);
             p += 6;
             continue;
-        } else if ((strncmp(p, "struct", 6) == 0) && !is_alnum(p[6])) {
+        }
+        else if ((strncmp(p, "struct", 6) == 0) && !is_alnum(p[6]))
+        {
             cur = new_token(TK_STRUCT, cur, p, 6);
             p += 6;
             continue;
-        } else if ((strncmp(p, ".", 1) == 0)) {
+        }
+        else if ((strncmp(p, ".", 1) == 0))
+        {
             cur = new_token(TK_DOT, cur, p, 1);
             p += 1;
             continue;
-        } else if ((strncmp(p, "int", 3) == 0) && !is_alnum(p[3])) {
+        }
+        else if ((strncmp(p, "int", 3) == 0) && !is_alnum(p[3]))
+        {
             cur = new_token(TK_INT, cur, p, 3);
             p += 3;
             continue;
-        } else if ((strncmp(p, "char", 4) == 0) && !is_alnum(p[4])) {
+        }
+        else if ((strncmp(p, "char", 4) == 0) && !is_alnum(p[4]))
+        {
             cur = new_token(TK_CHAR, cur, p, 4);
             p += 4;
             continue;
-        } else if (*p == '\'') {
+        }
+        else if (*p == '\'')
+        {
             cur = new_token(TK_NUM, cur, p, -1);
             p++;
             char c = *p;
-            if (c != '\\') {
+            if (c != '\\')
+            {
                 p++;
-            } else {
+            }
+            else
+            {
                 p++;
                 c = *p;
-                if (c == 'n') {
+                if (c == 'n')
+                {
                     c = '\n';
                 }
                 p++;
             }
-            if (*p != '\'') {
+            if (*p != '\'')
+            {
                 error("\'\'の間に複数文字が入っています");
             }
             p++;
             cur->val = (int)c;
             continue;
-        } else if (*p == '\"') {
+        }
+        else if (*p == '\"')
+        {
             int len = 1;
             // fprintf(stderr, "str\n");
-            while (*(p + len) != '\"') {
-                if (*(p + len) == '\\') {
+            while (*(p + len) != '\"')
+            {
+                if (*(p + len) == '\\')
+                {
                     len++;
                 }
                 len++;
@@ -116,17 +155,21 @@ tokenize(char* p)
             p += len;
             // fprintf(stderr, "%s\n", p);
             continue;
-
-        } else if (isalpha(*p)) {
+        }
+        else if (isalpha(*p))
+        {
             int len = 0;
             // is_alnumは自作した関数で、標準で用意されているisalnumではない(前者は引数が'_'の場合もtrueを返す)
-            while (is_alnum(*(p + len))) {
+            while (is_alnum(*(p + len)))
+            {
                 len++;
             }
             cur = new_token(TK_IDENT, cur, p, len);
             p += len;
             continue;
-        } else if (isdigit(*p)) {
+        }
+        else if (isdigit(*p))
+        {
             cur = new_token(TK_NUM, cur, p, -1);
             cur->val = strtol(p, &p, 10);
             continue;

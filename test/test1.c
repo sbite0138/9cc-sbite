@@ -15,10 +15,12 @@ int func()
 int main()
 {
     //this is test comment
-    if (func() <= 0) {
+    if (func() <= 0)
+    {
         printf("passed!\n"); //this is test comment
-
-    } else {
+    }
+    else
+    {
         printf("func() faild (actual:%d expect:%d)\n", func(), -1); //this is test comment
     }
     return 0; //this is test comment

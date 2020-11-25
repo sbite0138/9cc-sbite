@@ -1,12 +1,13 @@
 
-void f(int* x)
+void f(int *x)
 {
     *x = 42;
 }
 
 int main()
 {
-    struct {
+    struct
+    {
         int x;
         int y;
         char z;
