@@ -23,6 +23,7 @@ typedef enum {
     TK_CHAR,
     TK_STRUCT,
     TK_DOT,
+    TK_ARROW,
     TK_EOF
 } TokenKind;
 

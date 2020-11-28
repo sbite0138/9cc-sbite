@@ -15,8 +15,7 @@ new_token(TokenKind kind, Token *cur, char *str, int len)
     cur->next = tok;
     return tok;
 }
-Token *
-tokenize(char *p)
+Token *tokenize(char *p)
 {
     Token head;
     head.next = NULL;
@@ -40,7 +39,7 @@ tokenize(char *p)
             p++;
             continue;
         }
-        if ((memcmp(p, "==", 2) == 0) || (memcmp(p, "!=", 2) == 0) || (memcmp(p, "<=", 2) == 0) || (memcmp(p, ">=", 2) == 0))
+        else if ((memcmp(p, "==", 2) == 0) || (memcmp(p, "!=", 2) == 0) || (memcmp(p, "<=", 2) == 0) || (memcmp(p, ">=", 2) == 0) || (memcmp(p, "->", 2) == 0))
         {
             cur = new_token(TK_RESERVED, cur, p, 2);
             p += 2;
@@ -91,12 +90,6 @@ tokenize(char *p)
         {
             cur = new_token(TK_STRUCT, cur, p, 6);
             p += 6;
-            continue;
-        }
-        else if ((strncmp(p, ".", 1) == 0))
-        {
-            cur = new_token(TK_DOT, cur, p, 1);
-            p += 1;
             continue;
         }
         else if ((strncmp(p, "int", 3) == 0) && !is_alnum(p[3]))

@@ -30,6 +30,7 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
     // fprintf(stderr, "%s\n", token->str);
     if (node->kind == ND_ADD)
     {
+
         //  fprintf(stderr, "%d %d\n", lhs->kind, rhs->kind);
         // print_type(node->lhs->type);
         if (lhs->type->ty == PTR && rhs->type->ty == PTR)
@@ -77,11 +78,13 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
         // print_type(node->lhs->type);
         if (is_numeric(lhs->type) && is_numeric(rhs->type))
         {
+
             //lhs,rhsともに数値
             node->type->ty = INT;
         }
         else if (!is_numeric(lhs->type) && !is_numeric(rhs->type))
         {
+
             //lhs,rhsともにポインタ
             node->type->ty = INT;
         }
@@ -120,6 +123,11 @@ Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 
 void print_type(Type *type)
 {
+    if (type == NULL)
+    {
+        fprintf(stderr, "(null)\n");
+        return;
+    }
     switch (type->ty)
     {
     case INT:
@@ -130,11 +138,11 @@ void print_type(Type *type)
         return;
     case PTR:
         fprintf(stderr, "PTR->");
-        print_type(type->base);
+        //print_type(type->base);
         return;
     case ARRAY:
         fprintf(stderr, "ARRAY[%d]->", type->array_size);
-        print_type(type->base);
+        //print_type(type->base);
         return;
     case STRUCT:
         fprintf(stderr, "STRUCT {\n");
@@ -243,7 +251,7 @@ void program()
     code[i] = NULL;
 }
 
-Type *menber()
+Type *member()
 {
     Type *type = calloc(1, sizeof(Type));
     type->ty = STRUCT;
@@ -320,19 +328,21 @@ Type *decl_type()
     int base_type = token->kind;
     next_token(); // ここで int char struct などが読み飛ばされる
     Type *type = calloc(1, sizeof(Type));
+    Type *cur = type;
 
     if (base_type == TK_STRUCT)
     {
         //fprintf(stderr, "enter block1\n");
         //fprintf(stderr, "current token :%s\n", token->str);
 
-        type->ty = STRUCT;
+        cur->ty = STRUCT;
 
         if (consume("{"))
         {
+            //TODO 無名構造体へのポインタ
             //fprintf(stderr, "enter block2\n");
-            type = menber();
-            return type;
+            cur = member();
+            return cur;
         }
         else
         {
@@ -346,25 +356,49 @@ Type *decl_type()
             {
                 //すでにtoken->strの名前で構造体が定義されているので，その構造体の型を返す
                 next_token();
-                return str->type;
+                if (check_token("*"))
+                {
+                    while (consume("*"))
+                    {
+                        cur->ty = PTR;
+                        Type *next = calloc(1, sizeof(Type));
+                        cur->base = next;
+                        cur = next;
+                    }
+
+                    cur->ty = str->type->ty;
+                    cur->array_size = str->type->array_size;
+                    cur->members = str->type->members;
+                    cur->base = str->type->base;
+                    return type;
+                }
+                else
+                {
+                    cur = str->type;
+                    return cur;
+                }
             }
-            str = calloc(1, sizeof(Struct));
-            str->name = token->str;
-            str->len = token->len;
-            next_token();
-            expect("{");
-            str->type = menber();
-            str->next = structs;
-            structs = str;
-            return str->type;
+            else
+            {
+                //TODO 構造体宣言時に定義した，その構造体へのポインタ変数の処理
+                str = calloc(1, sizeof(Struct));
+                str->name = token->str;
+                str->len = token->len;
+                next_token();
+                expect("{");
+                str->type = member();
+                str->next = structs;
+                structs = str;
+                cur = str->type;
+                return cur;
+            }
         }
     }
     else
     {
-
-        Type *cur = type;
         while (consume("*"))
         {
+
             cur->ty = PTR;
             Type *next = calloc(1, sizeof(Type));
             cur->base = next;
@@ -882,6 +916,7 @@ Node *term()
             }
             if (lvar)
             {
+                // print_type(lvar->type);
                 if (lvar->type->ty == ARRAY)
                 {
                     // lvarが配列
@@ -946,6 +981,8 @@ Node *term()
                 }
                 else if (lvar->type->ty == STRUCT)
                 {
+                    //fprintf(stderr, "struct");
+                    //TODO ND_DOTみたいなのを作って，メンバへの参照コードを作る部分をコード生成の時にやらせるようにする
                     if (consume("."))
                     {
                         Member *member = find_member(lvar->type->members, token->str);
@@ -985,6 +1022,33 @@ Node *term()
                         node->rhs = new_node(ND_ADD, node_lvar, node_index);
                         node->type = node->rhs->type->base;
                         expect("]");
+                    }
+                    else if (lvar->type->ty == PTR && consume("->"))
+                    {
+                        node->kind = var_type;
+                        node->offset = lvar->offset;
+                        node->type = calloc(1, sizeof(Type));
+                        node->type = lvar->type;
+                        node->type2 = lvar->type;
+                        node->type->members = lvar->type->members;
+                        //print_type(lvar->type);
+                        // Node *deref = calloc(1, sizeof(Node));
+                        // deref->kind = ND_DEREF;
+                        // deref->rhs = node;
+                        // deref->type = lvar->type->base;
+                        // node = deref;
+                        Member *member = find_member(lvar->type->base->members, token->str);
+                        Node *index = new_node_num(member->offset);
+                        fprintf(stderr, "%d\n", member->offset);
+                        print_type(lvar->type);
+                        Node *res = calloc(1, sizeof(Node));
+                        res->kind = ND_SUB;
+                        res->rhs = index;
+                        res->lhs = node;
+                        res->type = member->ty;
+                        // fprintf(stderr, "%p\n", member->ty);
+                        next_token(token);
+                        node = res;
                     }
                     else
                     {
