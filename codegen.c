@@ -11,7 +11,10 @@ void gen_globals()
     char *varname = calloc(128, sizeof(char));
     for (; var != NULL; var = var->next)
     {
+
         strncpy(varname, var->name, var->len);
+        varname[var->len] = '\0';
+        // fprintf(stderr, "!%s %d\n", varname, var->len);
         printf(".comm %s, %d\n", varname, var->size);
     }
 }
@@ -24,22 +27,22 @@ void gen_strings()
     char *str = calloc(128, sizeof(char));
     for (; cur != NULL; cur = cur->next)
     {
-        //fprintf(stderr, "strings : %s\n", cur->str);
+        // fprintf(stderr, "strings : %s\n", cur->str);
         strncpy(str, cur->str, cur->len);
         str[cur->len] = '\0';
         printf(".LC%d:\n", cur->id);
         printf("  .string %s\n", str);
     }
-    //exit(0);
+    // exit(0);
 }
 
 void gen_ptr(Node *node)
 {
-    //l rax ,r rdi
+    // l rax ,r rdi
     assert(node->type->ty == PTR);
-    //print_type(node->lhs->type);
-    //print_type(node->rhs->type);
-    //これはINT+PTRみたいな部分のアセンブルになっていて（多分）、CHARはここに入らないという前提をおきます（おくので）（PTR+CHARはgccでも警告が出ます）
+    // print_type(node->lhs->type);
+    // print_type(node->rhs->type);
+    // これはINT+PTRみたいな部分のアセンブルになっていて（多分）、CHARはここに入らないという前提をおきます（おくので）（PTR+CHARはgccでも警告が出ます）
     if (node->lhs->type == INT)
     {
         assert(node->rhs->type->ty == PTR);
@@ -101,11 +104,11 @@ void gen(Node *node)
         printf("%s:\n", name);
         printf("  push rbp\n");
         printf("  mov rbp, rsp\n");
-        //rspが16の倍数でないと落ちます
+        // rspが16の倍数でないと落ちます
         printf("  sub rsp, %d\n", locals->offset + 16 - (locals->offset % 16));
-        //最悪をします。ごめんなさい。
-        //localsを終端まで数えることで、関数内に登場する変数の数を得ます。そこからargmunを引くことで、引数の変数がどこから始まるかを得ます。
-        //とても汚いので、あとで直しましょう
+        // 最悪をします。ごめんなさい。
+        // localsを終端まで数えることで、関数内に登場する変数の数を得ます。そこからargmunを引くことで、引数の変数がどこから始まるかを得ます。
+        // とても汚いので、あとで直しましょう
         while (cur != NULL)
         {
             argcnt++;
@@ -113,19 +116,19 @@ void gen(Node *node)
         }
         argcnt -= node->argnum;
         argcnt--;
-        //fprintf(stderr, "%d\n", argcnt);
+        // fprintf(stderr, "%d\n", argcnt);
         cur = locals;
         for (int i = 0; i < argcnt; i++)
         {
             cur = cur->next;
         }
 
-        //localの情報を元に引数の読み込みをしたいのだけど、localは後に追加したものが先頭に来ている（つまり、localの先頭は一番最後の引数）ので、iを大きい方から回している
+        // localの情報を元に引数の読み込みをしたいのだけど、localは後に追加したものが先頭に来ている（つまり、localの先頭は一番最後の引数）ので、iを大きい方から回している
         for (int i = node->argnum - 1; i >= 0; i--)
         {
             printf("  mov rax,  rbp\n");
             printf("  sub rax,  %d\n", cur->offset);
-            //print_type(cur->type);
+            // print_type(cur->type);
             if (cur->type->ty == INT)
             {
                 printf("  mov DWORD PTR[rax],  %s\n", arg_reg_32[i]);
@@ -148,24 +151,24 @@ void gen(Node *node)
     case ND_ADDR:
         if (node->rhs->kind == ND_LVAR)
         {
-            //fprintf(stderr, "LVAR\n");
+            // fprintf(stderr, "LVAR\n");
             gen_lval(node->rhs);
         }
         else
         {
-            //fprintf(stderr, "GVAR\n");
+            // fprintf(stderr, "GVAR\n");
             gen_gval(node->rhs);
         }
         return;
     case ND_DEREF:
-        //printf("#ND DEREF\n");
-        //deref_nest++;
+        // printf("#ND DEREF\n");
+        // deref_nest++;
         print_type(node->rhs->type);
         gen(node->rhs);
-        //deref_nest--;
+        // deref_nest--;
         printf("  pop rax\n");
-        //fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
-        //多分ここは*(a+INT)みたいな処理をアセンブルしていて、*(a+CHAR)みたいなのはgccでもWarnが出るので考えないことにします
+        // fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
+        // 多分ここは*(a+INT)みたいな処理をアセンブルしていて、*(a+CHAR)みたいなのはgccでもWarnが出るので考えないことにします
         printf("#DEREF\n");
         if (node->type->ty == ARRAY)
         {
@@ -192,8 +195,8 @@ void gen(Node *node)
         return;
     case ND_NOP:
         gen(node->rhs);
-        //deref_nest--;
-        // printf("  pop rax\n");
+        // deref_nest--;
+        //  printf("  pop rax\n");
         return;
     case ND_LVAR:
         gen_lval(node);
@@ -237,7 +240,7 @@ void gen(Node *node)
         printf("  push rax\n");
         return;
     case ND_ASSIGN:
-        //print_type(node->lhs->type);
+        // print_type(node->lhs->type);
 
         if (node->lhs->kind == ND_LVAR)
         {
@@ -250,7 +253,7 @@ void gen(Node *node)
         }
         // printf("#GEN LEFT DONE\n");
         gen(node->rhs);
-        //rdiを退避する(関数呼び出しの引数が格納されているかもしれないので)
+        // rdiを退避する(関数呼び出しの引数が格納されているかもしれないので)
         printf("  mov r9,rdi\n");
 
         printf("  pop rdi\n");
@@ -269,12 +272,12 @@ void gen(Node *node)
             printf("  mov [rax], rdi\n");
         }
         printf("  push rdi\n");
-        //rdiを復元する
+        // rdiを復元する
         printf("  mov rdi,r9\n");
         return;
     case ND_CALL:
-        //普通にgen()した後にレジスタに代入ってすると、例えばf(1,f(2,3,4),5)みたいなときに壊れる（f(...）を実行するまでに2つの引数を保管する
-        //必要があるので（ほんまか？））ので、一旦全部genしてからforでレジスタにpopしていきます
+        // 普通にgen()した後にレジスタに代入ってすると、例えばf(1,f(2,3,4),5)みたいなときに壊れる（f(...）を実行するまでに2つの引数を保管する
+        // 必要があるので（ほんまか？））ので、一旦全部genしてからforでレジスタにpopしていきます
         for (int i = 0; node_args; i++)
         {
 
@@ -282,7 +285,7 @@ void gen(Node *node)
             gen(node_args->node);
             printf("#GEN ARG DONE\n");
 
-            //printf("  pop rax\n");
+            // printf("  pop rax\n");
             /*if (node_args->node->type->ty == INT)
             {
                 printf("  mov %s, eax\n", arg_reg_32[i]);
@@ -290,15 +293,15 @@ void gen(Node *node)
             else
             */
             node_args = node_args->next;
-            //fprintf(stderr, "hoge");
+            // fprintf(stderr, "hoge");
         }
         node_args = node->args;
-        //fprintf(stderr, "argnum:%d\n", node->argnum);
+        // fprintf(stderr, "argnum:%d\n", node->argnum);
         for (int i = node->argnum - 1; i >= 0; i--)
         {
             printf("  pop %s\n", arg_reg_64[i]);
         }
-        //fprintf(stderr, "done\n");
+        // fprintf(stderr, "done\n");
 
         strncpy(name, node->funcname, node->funcnamelen);
         printf("  mov al, 0\n");
@@ -307,7 +310,7 @@ void gen(Node *node)
         return;
     case ND_RETURN:
         printf("#RETURN\n");
-        //fprintf(stderr, "%d\n", node->lhs->kind == ND_DEREF);
+        // fprintf(stderr, "%d\n", node->lhs->kind == ND_DEREF);
         gen(node->lhs);
         printf("  pop rax\n");
         printf("  mov rsp, rbp\n");
@@ -368,7 +371,7 @@ void gen(Node *node)
         current_label = label;
         if (node->lhs->lhs != NULL)
         {
-            //fprintf(stdout, ";gen lhs->lhs\n");
+            // fprintf(stdout, ";gen lhs->lhs\n");
             gen(node->lhs->lhs);
             printf("  pop rax\n");
         }
@@ -376,20 +379,20 @@ void gen(Node *node)
 
         if (node->lhs->rhs != NULL)
         {
-            //fprintf(stdout, ";gen lhs->rhs\n");
+            // fprintf(stdout, ";gen lhs->rhs\n");
             gen(node->lhs->rhs);
             printf("  pop rax\n");
             printf("  cmp rax,0 \n");
             printf("  je .Lend%03d\n", current_label);
         }
-        //fprintf(stdout, ";gen rhs->rhs\n");
+        // fprintf(stdout, ";gen rhs->rhs\n");
 
         gen(node->rhs->rhs);
         printf("  pop rax\n");
 
         if (node->rhs->lhs != NULL)
         {
-            //fprintf(stdout, ";gen rhs->lhs\n");
+            // fprintf(stdout, ";gen rhs->lhs\n");
             gen(node->rhs->lhs);
             printf("  pop rax\n");
         }
@@ -401,8 +404,8 @@ void gen(Node *node)
     case ND_BLOCK:
         while (node_block)
         {
-            //fprintf(stderr, "%p\n", node_block);
-            //fprintf(stderr, "%p\n", node_block->stmt_node);
+            // fprintf(stderr, "%p\n", node_block);
+            // fprintf(stderr, "%p\n", node_block->stmt_node);
 
             gen(node_block->stmt_node);
             printf("  pop rax\n");
@@ -415,7 +418,7 @@ void gen(Node *node)
     }
     gen(node->lhs);
     gen(node->rhs);
-    //rdiを退避する(関数呼び出しの引数が格納されているかもしれないので)
+    // rdiを退避する(関数呼び出しの引数が格納されているかもしれないので)
     printf("  mov r9,rdi\n");
     printf("  pop rdi\n");
     printf("  pop rax\n");
@@ -424,17 +427,17 @@ void gen(Node *node)
     {
 
     case ND_ADD:
-        //if (node->type->ty == PTR)
+        // if (node->type->ty == PTR)
         //{
-        //   gen_ptr(node);
-        //}
+        //    gen_ptr(node);
+        // }
         printf("  add rax, rdi\n");
         break;
     case ND_SUB:
-        //if (node->type->ty == PTR)
+        // if (node->type->ty == PTR)
         //{
-        //   gen_ptr(node);
-        //}
+        //    gen_ptr(node);
+        // }
         printf("  sub rax, rdi\n");
         break;
     case ND_MUL:
@@ -471,6 +474,6 @@ void gen(Node *node)
         break;
     }
     printf("  push rax\n");
-    //rdiを復元する
+    // rdiを復元する
     printf("  mov rdi,r9\n");
 }
