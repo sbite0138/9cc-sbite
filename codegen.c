@@ -149,15 +149,15 @@ void gen(Node *node)
         printf("  push %d\n", node->val);
         return;
     case ND_ADDR:
-        if (node->rhs->kind == ND_LVAR)
+        if (node->target->kind == ND_LVAR)
         {
             // fprintf(stderr, "LVAR\n");
-            gen_lval(node->rhs);
+            gen_lval(node->target);
         }
         else
         {
             // fprintf(stderr, "GVAR\n");
-            gen_gval(node->rhs);
+            gen_gval(node->target);
         }
         return;
     case ND_DEREF:

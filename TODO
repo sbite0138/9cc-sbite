@@ -1,5 +1,4 @@
 - Nodeにrhs,lhs以外の子ノードを表す適切なメンバを生やし、これを用いて処理を行うように変更する
-    - ND_ADDR: target
     - ND_DEREF: target
     - ND_CALL: stmt
     - ND_IF: cond,true

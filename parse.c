@@ -835,10 +835,10 @@ Node *unary()
     {
         Node *node = calloc(1, sizeof(Node));
         node->kind = ND_ADDR;
-        node->rhs = unary();
+        node->target = unary();
         node->type = calloc(1, sizeof(Type));
         node->type->ty = PTR;
-        node->type->base = node->rhs->type;
+        node->type->base = node->target->type;
         return node;
     }
 
