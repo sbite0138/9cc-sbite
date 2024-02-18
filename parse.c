@@ -846,9 +846,9 @@ Node *unary()
     {
         Node *node = calloc(1, sizeof(Node));
         node->kind = ND_DEREF;
-        node->rhs = unary();
+        node->target = unary();
         // node->type = calloc(1, sizeof(Type));
-        node->type = node->rhs->type->base;
+        node->type = node->target->type->base;
         return node;
     }
     if (consume_tokenkind(TK_SIZEOF))
@@ -947,7 +947,7 @@ Node *term()
                             node = new_node(ND_ADD, node, index);
                             Node *deref = calloc(1, sizeof(Node));
                             deref->kind = ND_DEREF;
-                            deref->rhs = node;
+                            deref->target = node;
                             deref->type = node->type->base;
                             node = deref;
                             expect("]");
@@ -1021,8 +1021,8 @@ Node *term()
                             node_lvar->gvarnamelen = lvar->len;
                         }
                         Node *node_index = add();
-                        node->rhs = new_node(ND_ADD, node_lvar, node_index);
-                        node->type = node->rhs->type->base;
+                        node->target = new_node(ND_ADD, node_lvar, node_index);
+                        node->type = node->target->type->base;
                         expect("]");
                     }
                     else if (lvar->type->ty == PTR && consume("->"))
@@ -1033,12 +1033,7 @@ Node *term()
                         node->type = lvar->type;
                         node->type2 = lvar->type;
                         node->type->members = lvar->type->members;
-                        // print_type(lvar->type);
-                        //  Node *deref = calloc(1, sizeof(Node));
-                        //  deref->kind = ND_DEREF;
-                        //  deref->rhs = node;
-                        //  deref->type = lvar->type->base;
-                        //  node = deref;
+
                         Member *member = find_member(lvar->type->base->members, token->str);
                         Node *index = new_node_num(member->offset);
                         fprintf(stderr, "%d\n", member->offset);

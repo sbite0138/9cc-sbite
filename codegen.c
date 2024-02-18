@@ -60,7 +60,7 @@ void gen_gval(Node *node)
 {
     if (node->kind == ND_DEREF)
     {
-        gen(node->rhs);
+        gen(node->target);
         return;
     }
     char *varname = calloc(128, sizeof(char));
@@ -73,7 +73,7 @@ void gen_lval(Node *node)
 {
     if (node->kind == ND_DEREF)
     {
-        gen(node->rhs);
+        gen(node->target);
         printf("#back\n");
         return;
     }
@@ -163,8 +163,8 @@ void gen(Node *node)
     case ND_DEREF:
         // printf("#ND DEREF\n");
         // deref_nest++;
-        print_type(node->rhs->type);
-        gen(node->rhs);
+        print_type(node->target->type);
+        gen(node->target);
         // deref_nest--;
         printf("  pop rax\n");
         // fprintf(stderr, "%p\n", node->rhs->type->ptr_to);
@@ -176,12 +176,12 @@ void gen(Node *node)
             printf("  push rax\n");
             return;
         }
-        if (node->rhs->type->base->ty == INT)
+        if (node->target->type->base->ty == INT)
         {
             printf("  mov eax, DWORD  PTR[rax]\n");
         }
         // charも必要ですね。それはそう
-        else if (node->rhs->type->base->ty == CHAR)
+        else if (node->target->type->base->ty == CHAR)
         {
             printf("  movsx eax, BYTE  PTR[rax]\n");
         }
