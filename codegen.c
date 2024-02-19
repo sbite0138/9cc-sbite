@@ -339,15 +339,15 @@ void gen(Node *node)
     case ND_IFELSE:
         label++;
         current_label = label;
-        gen(node->lhs);
+        gen(node->condition);
         printf("  pop rax\n");
         printf("  cmp rax,0 \n");
         printf("  je .Lelse%03d\n", current_label);
-        gen(node->rhs->lhs);
+        gen(node->true_stmt);
         printf("  pop rax\n");
         printf("  jmp .Lend%03d\n", current_label);
         printf(".Lelse%03d:\n", current_label);
-        gen(node->rhs->rhs);
+        gen(node->false_stmt);
         printf("  pop rax\n");
         printf(".Lend%03d:\n", current_label);
         printf("  push 0xBEEF\n");

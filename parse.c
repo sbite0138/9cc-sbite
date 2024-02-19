@@ -595,18 +595,17 @@ Node *stmt()
         node = calloc(1, sizeof(Node));
         node->kind = ND_IF;
         node->condition = expr();
-        node->lhs=node->condition;
+        // node->lhs = node->condition;
         expect(")");
         Node *node_stmt_true = stmt();
+        node->true_stmt = node_stmt_true;
+
         if (consume_tokenkind(TK_ELSE))
         {
             node->kind = ND_IFELSE;
-            node->rhs = new_node(ND_IFELSE, node_stmt_true, stmt());
+            node->false_stmt = stmt();
         }
-        else
-        {
-            node->true_stmt = node_stmt_true;
-        }
+
         return node;
     }
     else if (consume_tokenkind(TK_WHILE))
