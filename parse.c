@@ -583,7 +583,7 @@ Node *stmt()
     {
         node = calloc(1, sizeof(Node));
         node->kind = ND_RETURN;
-        node->lhs = expr();
+        node->target = expr();
         // fprintf(stderr, "e");
         expect(";");
         // fprintf(stderr, "f");
@@ -611,9 +611,9 @@ Node *stmt()
         expect("(");
         node = calloc(1, sizeof(Node));
         node->kind = ND_WHILE;
-        node->lhs = expr();
+        node->condition = expr();
         expect(")");
-        node->rhs = stmt();
+        node->statement = stmt();
         return node;
     }
     else if (consume_tokenkind(TK_FOR))

@@ -139,6 +139,9 @@ int solve(int *b)
     int y;
     int x;
     int i;
+    printf("\n");
+    show(b);
+    printf("\n");
     if (complete(b) == 1)
     {
         printf("complete!\n");
@@ -159,15 +162,18 @@ int solve(int *b)
                 int k;
                 for (k = 1; k <= 9; k = k + 1)
                 {
+                    printf("trying %d at %d %d\n", k, y, x);
                     c[9 * y + x] = k;
                     if (check(c) == 1)
                     {
+                        printf("ok\n");
                         int ret;
                         ret = solve(c);
                         if (ret == 1)
                         {
                             return 1;
                         }
+                        
                     }
                 }
             }

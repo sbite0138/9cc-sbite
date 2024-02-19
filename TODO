@@ -3,5 +3,5 @@
     - ND_IFELSE: cond,true,false
     - ND_FOR: init,cond,update
     - ND_WHILE: cond, stmt
-    - ND_RETURN:return
+    - ND_RETURN:target
 - void gen_lval(Node *node)のif (node->kind == ND_DEREF)に入るようなテストケースの追加

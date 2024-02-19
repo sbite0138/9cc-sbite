@@ -311,7 +311,7 @@ void gen(Node *node)
     case ND_RETURN:
         printf("#RETURN\n");
         // fprintf(stderr, "%d\n", node->lhs->kind == ND_DEREF);
-        gen(node->lhs);
+        gen(node->target);
         printf("  pop rax\n");
         printf("  mov rsp, rbp\n");
         printf("  pop rbp\n");
@@ -356,11 +356,11 @@ void gen(Node *node)
         label++;
         current_label = label;
         printf(".Lbegin%03d:\n", current_label);
-        gen(node->lhs);
+        gen(node->condition);
         printf("  pop rax\n");
         printf("  cmp rax,0 \n");
         printf("  je .Lend%03d\n", current_label);
-        gen(node->rhs);
+        gen(node->statement);
         printf("  pop rax\n");
         printf("  jmp .Lbegin%03d\n", current_label);
         printf(".Lend%03d:\n", current_label);
