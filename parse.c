@@ -623,46 +623,38 @@ Node *stmt()
         expect("(");
         node = calloc(1, sizeof(Node));
         node->kind = ND_FOR;
-
-        // for (A;B;C) D; のA,Bを格納するノード
-        Node *node_init_cond = calloc(1, sizeof(Node));
-
-        // for (A;B;C) D; のC,Dを格納するノード
-        Node *node_update_stmt = calloc(1, sizeof(Node));
         if (!check_token(";"))
         {
-            node_init_cond->lhs = expr();
+            node->initialize = expr();
         }
         else
         {
-            node_init_cond->lhs = NULL;
+            node->initialize = NULL;
         }
         consume(";");
 
         if (!check_token(";"))
         {
-            node_init_cond->rhs = expr();
+            node->condition = expr();
         }
         else
         {
-            node_init_cond->rhs = NULL;
+            node->condition = NULL;
         }
         consume(";");
 
         if (!check_token(")"))
         {
-            node_update_stmt->lhs = expr();
+            node->update = expr();
         }
         else
         {
-            node_update_stmt->lhs = NULL;
+            node->update = NULL;
         }
         consume(";");
 
         expect(")");
-        node_update_stmt->rhs = stmt();
-        node->lhs = node_init_cond;
-        node->rhs = node_update_stmt;
+        node->statement = stmt();
         return node;
     }
     else if (consume("{"))

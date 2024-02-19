@@ -369,31 +369,31 @@ void gen(Node *node)
     case ND_FOR:
         label++;
         current_label = label;
-        if (node->lhs->lhs != NULL)
+        if (node->initialize != NULL)
         {
             // fprintf(stdout, ";gen lhs->lhs\n");
-            gen(node->lhs->lhs);
+            gen(node->initialize);
             printf("  pop rax\n");
         }
         printf(".Lbegin%03d:\n", current_label);
 
-        if (node->lhs->rhs != NULL)
+        if (node->condition != NULL)
         {
             // fprintf(stdout, ";gen lhs->rhs\n");
-            gen(node->lhs->rhs);
+            gen(node->condition);
             printf("  pop rax\n");
             printf("  cmp rax,0 \n");
             printf("  je .Lend%03d\n", current_label);
         }
         // fprintf(stdout, ";gen rhs->rhs\n");
 
-        gen(node->rhs->rhs);
+        gen(node->statement);
         printf("  pop rax\n");
 
-        if (node->rhs->lhs != NULL)
+        if (node->update != NULL)
         {
             // fprintf(stdout, ";gen rhs->lhs\n");
-            gen(node->rhs->lhs);
+            gen(node->update);
             printf("  pop rax\n");
         }
         printf("  jmp .Lbegin%03d\n", current_label);

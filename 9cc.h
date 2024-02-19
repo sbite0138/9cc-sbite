@@ -111,6 +111,9 @@ struct Node
     Node *condition;
     Node *true_statement;
     Node *false_statement;
+    Node *initialize;
+    Node *update;
+    Node *statement;
 
     Block *block;
     int val;         // kindがND_NUMの場合のみ使う
