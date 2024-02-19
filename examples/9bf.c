@@ -103,9 +103,6 @@ int main()
             }
             printf("\n");
         }
-        else
-        {
-        }
         pcindex = pcindex + 1;
     }
     return 0;
