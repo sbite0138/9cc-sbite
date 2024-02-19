@@ -327,11 +327,11 @@ void gen(Node *node)
     case ND_IF:
         label++;
         current_label = label;
-        gen(node->lhs);
+        gen(node->condition);
         printf("  pop rax\n");
         printf("  cmp rax,0 \n");
         printf("  je .Lend%03d\n", current_label);
-        gen(node->rhs);
+        gen(node->true_stmt);
         printf("  pop rax\n");
         printf(".Lend%03d:\n", current_label);
         printf("  push 0xBEEF\n");

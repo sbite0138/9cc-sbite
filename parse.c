@@ -594,7 +594,8 @@ Node *stmt()
         expect("(");
         node = calloc(1, sizeof(Node));
         node->kind = ND_IF;
-        node->lhs = expr();
+        node->condition = expr();
+        node->lhs=node->condition;
         expect(")");
         Node *node_stmt_true = stmt();
         if (consume_tokenkind(TK_ELSE))
@@ -604,7 +605,7 @@ Node *stmt()
         }
         else
         {
-            node->rhs = node_stmt_true;
+            node->true_stmt = node_stmt_true;
         }
         return node;
     }
