@@ -109,9 +109,9 @@ struct Node
     Node *rhs;
     Node *target;
     Node *condition;
-    Node *true_stmt;
-    Node *false_stmt;
-    
+    Node *true_statement;
+    Node *false_statement;
+
     Block *block;
     int val;         // kindがND_NUMの場合のみ使う
     int offset;      // kindがND_LVARの場合のみ使う

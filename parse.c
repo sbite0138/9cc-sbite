@@ -598,12 +598,12 @@ Node *stmt()
         // node->lhs = node->condition;
         expect(")");
         Node *node_stmt_true = stmt();
-        node->true_stmt = node_stmt_true;
+        node->true_statement = node_stmt_true;
 
         if (consume_tokenkind(TK_ELSE))
         {
             node->kind = ND_IFELSE;
-            node->false_stmt = stmt();
+            node->false_statement = stmt();
         }
 
         return node;

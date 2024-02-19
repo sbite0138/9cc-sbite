@@ -331,7 +331,7 @@ void gen(Node *node)
         printf("  pop rax\n");
         printf("  cmp rax,0 \n");
         printf("  je .Lend%03d\n", current_label);
-        gen(node->true_stmt);
+        gen(node->true_statement);
         printf("  pop rax\n");
         printf(".Lend%03d:\n", current_label);
         printf("  push 0xBEEF\n");
@@ -343,11 +343,11 @@ void gen(Node *node)
         printf("  pop rax\n");
         printf("  cmp rax,0 \n");
         printf("  je .Lelse%03d\n", current_label);
-        gen(node->true_stmt);
+        gen(node->true_statement);
         printf("  pop rax\n");
         printf("  jmp .Lend%03d\n", current_label);
         printf(".Lelse%03d:\n", current_label);
-        gen(node->false_stmt);
+        gen(node->false_statement);
         printf("  pop rax\n");
         printf(".Lend%03d:\n", current_label);
         printf("  push 0xBEEF\n");
