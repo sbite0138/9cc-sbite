@@ -1,7 +1,1 @@
-- Nodeにrhs,lhs以外の子ノードを表す適切なメンバを生やし、これを用いて処理を行うように変更する
-    - ND_IF: cond,true
-    - ND_IFELSE: cond,true,false
-    - ND_FOR: init,cond,update
-    - ND_WHILE: cond, stmt
-    - ND_RETURN:target
 - void gen_lval(Node *node)のif (node->kind == ND_DEREF)に入るようなテストケースの追加
