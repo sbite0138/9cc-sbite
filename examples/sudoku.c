@@ -128,9 +128,9 @@ int show(int *b)
     {
         for (x = 0; x < 9; x = x + 1)
         {
-            printf("%d ", b[9 * y + x]);
+            print_num(b[9 * y + x]);
         }
-        printf("\n");
+        print_char("\n");
     }
     return 0;
 }
@@ -139,12 +139,13 @@ int solve(int *b)
     int y;
     int x;
     int i;
-    printf("\n");
+    print_char("\n");
     show(b);
-    printf("\n");
+    print_char("\n");
     if (complete(b) == 1)
     {
-        printf("complete!\n");
+        print_char("!");
+        print_char("\n");
         show(b);
         return 1;
     }
@@ -162,11 +163,9 @@ int solve(int *b)
                 int k;
                 for (k = 1; k <= 9; k = k + 1)
                 {
-                    printf("trying %d at %d %d\n", k, y, x);
                     c[9 * y + x] = k;
                     if (check(c) == 1)
                     {
-                        printf("ok\n");
                         int ret;
                         ret = solve(c);
                         if (ret == 1)
